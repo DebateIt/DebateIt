@@ -4,7 +4,7 @@ from .models import *
 
 def seed(db: Session) -> None:
     # Empty the database
-    tables = [User, Topic, Debate, Recording]
+    tables = [Recording, Debate, Topic, User]
     for t in tables:
         db.execute(delete(t))
     db.commit()
