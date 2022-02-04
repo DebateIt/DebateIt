@@ -3,7 +3,7 @@ import '@fontsource/nunito';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Drawer from '@mui/material/IconButton';
+import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -11,19 +11,24 @@ import { ThemeProvider } from '@mui/material/styles';
 
 import theme from '../Theme';
 
-function NavBar(props) {
+function NavBar() {
 	return (
 		<ThemeProvider theme={theme}>
 			<Drawer
-				variant="permanent"
+				variant="persistent"
 				anchor="left"
 				open={true}
+				sx={{
+					padding: 0,
+					height: '100%'
+				}}
 			>
 				<Box
 					component="nav"
 					sx={{
 						width: 250,
-						bgcolor: 'secondary.main'
+						bgcolor: 'secondary.main',
+						height: '100%'
 					}}
 				>
 					<List>
