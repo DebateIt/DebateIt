@@ -1,15 +1,13 @@
 import NavBar from './components/navbar';
-import CssBaseline from '@mui/material/CssBaseline';
+import User from './components/User';
 
 function App() {
   return (
-    <div
-      className="App"
-    >
-      <CssBaseline />
-      <NavBar />
+    <div className="App columns">
+        <NavBar />
+        <User />
     </div>
   );
-}
+};
 
 export default App;
