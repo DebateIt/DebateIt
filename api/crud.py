@@ -1,6 +1,8 @@
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 from .models import *
+from .dependencies import get_db
+from fastapi import Depends,HTTPException,status,Response
 
 def seed(db: Session) -> None:
     # Empty the database
@@ -46,3 +48,48 @@ def seed(db: Session) -> None:
     db.refresh(slur)
     db.refresh(us_china)
     db.refresh(feminism)
+
+def IsUserExist(username, db: Session) -> bool:
+    existance = db.query(User).filter(User.username == username)
+    return db.query(existance.exists()).scalar()
+
+def getAllUsers(db:Session) -> list[User]:
+    return db.query(User).all()
+
+def checkUserExistance(username,db) -> bool:
+    if username is None:
+        return False
+    elif not IsUserExist(username,db):
+        return False
+    return True
+
+def getOneUser(username:str,db:Session) -> User:
+    if not checkUserExistance(username,db):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid Username or Password")
+    else:
+        return db.query(User).filter(User.username == username).first()
+
+def delOneUser(username:str,db:Session) -> Response:
+    if not checkUserExistance(username,db):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid Username or Password")
+    db.query(User).filter(User.username == username)\
+            .delete(synchronize_session='fetch')
+    db.commit()
+    return Response(status_code=status.HTTP_200_OK,content=f"User {username} is deleted")
+
+def updateOneUser(username:str,password:str,db:Session) -> User:
+    if not IsUserExist(username,db):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User Not Exist")
+    db.query(User).filter(User.username == username)\
+            .update({"password":password},synchronize_session='fetch')
+    db.commit()
+    return db.query(User).filter(User.username == username).first()
+
+def addOneUser(username:str,password:str,db:Session) -> User:
+    if IsUserExist(username,db):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Username Already Exist")
+    new_user = User(username=username,password=password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
