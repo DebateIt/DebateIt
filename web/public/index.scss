@@ -1,5 +1,20 @@
 @charset "utf-8";
-@import "../node_modules/bulma/bulma.sass";
 
-$primary: rgb(#36558F, 100%);
-$info: rgb(#40376E, 100%);
+@import url('https://fonts.googleapis.com/css2?family=Nunito');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue');
+
+$family-primary: "Bebas Neue";
+$family-secondary: "Nunito";
+
+$primary: #40376E;
+$info: #36558F;
+$success: #FCA311;
+
+$body-background-color: $info;
+$input-background-color: $primary;
+$input-color: #fff;
+$input-border-color: $info;
+$input-hover-border-color: $primary;
+$input-focus-border-color: $primary;
+
+@import "../node_modules/bulma/bulma.sass";
