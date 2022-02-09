@@ -20,13 +20,13 @@ def get_all_user_info(db: Session= Depends(get_db)):
 
 @router.get("/user/{username}")
 def get_user_info(username:str, db: Session= Depends(get_db)) -> User:
-    if not checkUserExistance(username,db):
+    if not IsUserExist(username,db):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid Username or Password")
     return getOneUser(username,db)
 
 @router.delete("/user/{username}")
 def del_user(username:str, db: Session= Depends(get_db)):
-    if not checkUserExistance(username,db):
+    if not IsUserExist(username,db):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid Username or Password")
     return delOneUser(username,db)

@@ -49,18 +49,13 @@ def seed(db: Session) -> None:
     db.refresh(feminism)
 
 def IsUserExist(username, db: Session) -> bool:
+    if username is None:
+        return False
     existance = db.query(User).filter(User.username == username)
     return db.query(existance.exists()).scalar()
 
 def getAllUsers(db:Session) -> list[User]:
     return db.query(User).all()
-
-def checkUserExistance(username,db) -> bool:
-    if username is None:
-        return False
-    elif not IsUserExist(username,db):
-        return False
-    return True
 
 def getOneUser(username:str,db:Session) -> User:
     return db.query(User).filter(User.username == username).first()
