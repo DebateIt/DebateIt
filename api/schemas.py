@@ -1,7 +1,8 @@
-from .database import Base
-from pydantic import BaseModel,validator,ValidationError
+from .database import SessionLocal
+from pydantic import BaseModel,validator
 from typing import Optional
 from fastapi import HTTPException,status
+from . import crud
 
 class UserPydantic(BaseModel):
     id:Optional[int] = None
@@ -14,4 +15,20 @@ class UserPydantic(BaseModel):
             raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="Invalid Password")
         return v
 
+class CreateUserPydantic(UserPydantic):
+    @validator('username')
+    def CheckNameExist(cls,v):
+        db = SessionLocal()
+        if (crud.checkUserExistance(v,db)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Username Already Exist")
+        db.close()
+        return v
 
+class UpdateUserPydantic(UserPydantic):
+    @validator('username')
+    def CheckNameExist(cls,v):
+        db = SessionLocal()
+        if (crud.checkUserExistance(v,db)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Username Not Exist")
+        db.close()
+        return v
