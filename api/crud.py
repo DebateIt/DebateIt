@@ -66,11 +66,15 @@ def delOneUser(username:str,db:Session) -> Response:
     db.commit()
     return Response(status_code=status.HTTP_200_OK,content=f"User {username} is deleted")
 
-def updateOneUser(username:str,password:str,db:Session) -> User:
-    db.query(User).filter(User.username == username)\
-            .update({"password":password},synchronize_session='fetch')
+def updateOneUser(db:Session,username:str,new_username:str,new_password:str) -> User:
+    if new_password is not None:
+        db.query(User).filter(User.username == username)\
+                .update({"password":new_password},synchronize_session='fetch')
+    if new_username is not None:
+        db.query(User).filter(User.username == username)\
+                .update({"username":new_username},synchronize_session='fetch')
     db.commit()
-    return db.query(User).filter(User.username == username).first()
+    return db.query(User).filter(User.username == new_username).first()
 
 def addOneUser(username:str,password:str,db:Session) -> User:
     new_user = User(username=username,password=password)
