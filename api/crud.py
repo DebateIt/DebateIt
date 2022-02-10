@@ -1,6 +1,7 @@
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 from .models import *
+from fastapi import status,Response
 
 def seed(db: Session) -> None:
     # Empty the database
@@ -46,3 +47,41 @@ def seed(db: Session) -> None:
     db.refresh(slur)
     db.refresh(us_china)
     db.refresh(feminism)
+
+def IsUserExist(username, db: Session) -> bool:
+    if username is None:
+        return False
+    existance = db.query(User).filter(User.username == username)
+    return db.query(existance.exists()).scalar()
+
+def getAllUsers(db:Session) -> list[User]:
+    return db.query(User).all()
+
+def getOneUser(username:str,db:Session) -> User:
+    return db.query(User).filter(User.username == username).first()
+
+def delOneUser(username:str,db:Session) -> Response:
+    db.query(User).filter(User.username == username)\
+            .delete(synchronize_session='fetch')
+    db.commit()
+    return Response(status_code=status.HTTP_200_OK,content=f"User {username} is deleted")
+
+def updateOneUser(db:Session,username:str,new_username:str,new_password:str) -> User:
+    if new_password is not None:
+        db.query(User).filter(User.username == username)\
+                .update({"password":new_password},synchronize_session='fetch')
+
+    if new_username is not None:
+        db.query(User).filter(User.username == username)\
+                .update({"username":new_username},synchronize_session='fetch')
+        username = new_username
+    db.commit()
+
+    return db.query(User).filter(User.username == username).first()
+
+def addOneUser(username:str,password:str,db:Session) -> User:
+    new_user = User(username=username,password=password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
