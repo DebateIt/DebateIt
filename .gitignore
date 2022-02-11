@@ -1,3 +1,4 @@
 **/__**
 **/.*
 !.gitignore
+web/public/index.css
