@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App columns m-0">
         <NavBar />
-        <Registration />
+        <User />
     </div>
   );
 };

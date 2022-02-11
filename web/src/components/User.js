@@ -51,15 +51,14 @@ function User() {
                     </div>
                 </div>
                 <div className="field is-horizontal">
-                    <div className="field-label"></div>
                     <div className="field-body">
                         <div className="field">
-                            <button className="button is-medium is-success has-text-info">
+                            <button className="button is-medium is-success has-text-info is-fullwidth">
                                 Save
                             </button>
                         </div>
                         <div className="field">
-                            <button className="button is-medium is-primary">
+                            <button className="button is-medium is-primary is-fullwidth">
                                 Logout
                             </button>
                         </div>
