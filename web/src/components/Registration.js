@@ -50,16 +50,11 @@ function User() {
                         </div>
                     </div>
                 </div>
-                <div className="field is-horizontal">
+                <div className="field">
                     <div className="field-body">
                         <div className="field">
                             <button className="button is-medium is-success has-text-info is-fullwidth">
-                                Save
-                            </button>
-                        </div>
-                        <div className="field">
-                            <button className="button is-medium is-primary is-fullwidth">
-                                Logout
+                                Register
                             </button>
                         </div>
                     </div>
