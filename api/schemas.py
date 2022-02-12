@@ -3,6 +3,8 @@ from pydantic import BaseModel,validator
 from typing import Optional
 from fastapi import HTTPException,status
 from . import crud
+from . import auth
+
 
 class UserPydantic(BaseModel):
     id:Optional[int] = None
@@ -39,4 +41,12 @@ class UpdateUserPydantic(BaseModel):
     def passwd_cannot_be_None(cls,v):
         if v is None or v == "":
             raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,detail="Invalid Password")
-        return v
+        return auth.pwd_context.hash(v)
+
+class Token(BaseModel):
+    token_content: str
+    token_type: str
+
+class TokenData(BaseModel):
+    id:int
+    username:str

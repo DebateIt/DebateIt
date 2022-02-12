@@ -2,6 +2,7 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 from .models import *
 from fastapi import status,Response
+from . import schemas
 
 def seed(db: Session) -> None:
     # Empty the database
@@ -66,15 +67,15 @@ def delOneUser(username:str,db:Session) -> Response:
     db.commit()
     return Response(status_code=status.HTTP_200_OK,content=f"User {username} is deleted")
 
-def updateOneUser(db:Session,username:str,new_username:str,new_password:str) -> User:
-    if new_password is not None:
+def updateOneUser(db:Session,username:str,new_user:schemas.UpdateUserPydantic) -> User:
+    if new_user.new_password is not None:
         db.query(User).filter(User.username == username)\
-                .update({"password":new_password},synchronize_session='fetch')
+                .update({"password":new_user.new_password},synchronize_session='fetch')
 
-    if new_username is not None:
+    if new_user.new_username is not None:
         db.query(User).filter(User.username == username)\
-                .update({"username":new_username},synchronize_session='fetch')
-        username = new_username
+                .update({"username":new_user.new_username},synchronize_session='fetch')
+        username = new_user.new_username
     db.commit()
 
     return db.query(User).filter(User.username == username).first()
