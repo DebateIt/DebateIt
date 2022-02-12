@@ -11,6 +11,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "3.10"
+      - name: Setup Postgres database
+        uses: Daniel-Marynicz/postgresql-action@master
+        with:
+          app_user: debate
+          app_user_password: helloworld
+          app_db: debateit
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
