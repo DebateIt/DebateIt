@@ -25,7 +25,9 @@ def get_user_info(username:str, db: Session= Depends(get_db)) -> User:
     return getOneUser(username,db)
 
 @router.delete("/user/{username}")
-def del_user(username:str, db: Session= Depends(get_db)):
+def del_user(username:str, 
+            db: Session= Depends(get_db),
+            currUser:schemas.TokenData = Depends(auth.getCurrentUser)):
     if not IsUserExist(username,db):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User Not Found")
     return delOneUser(username,db)
