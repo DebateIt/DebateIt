@@ -2,7 +2,7 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 from .models import *
 from fastapi import status,Response
-from . import schemas
+from . import schemas,auth
 
 def seed(db: Session) -> None:
     # Empty the database
@@ -81,7 +81,7 @@ def updateOneUser(db:Session,username:str,new_user:schemas.UpdateUserPydantic) -
     return db.query(User).filter(User.username == username).first()
 
 def addOneUser(username:str,password:str,db:Session) -> User:
-    new_user = User(username=username,password=password)
+    new_user = User(username=username,password=auth.pwd_context.hash(password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)

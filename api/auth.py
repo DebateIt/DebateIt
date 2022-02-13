@@ -5,12 +5,10 @@ from typing import Optional
 from . import schemas
 from fastapi import Depends,HTTPException,status
 from fastapi.security import OAuth2PasswordBearer
+from . import config
 
 
 OAuth2Scheme = OAuth2PasswordBearer(tokenUrl="login")
-SECRET_KEY = "62bead1112b0b0b98f060292843696a4efa22ec29909bf04729a1841224d3e1b"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password, hashed_password):
@@ -21,14 +19,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=90)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode,config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
 
 def verify_token(token:str,credentials_exception):
     try:
-        payload = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        payload = jwt.decode(token,config.SECRET_KEY,algorithms=[config.ALGORITHM])
         username = payload.get('username')
         userID = payload.get('id')
         if username is None or userID is None:
