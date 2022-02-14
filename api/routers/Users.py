@@ -32,7 +32,6 @@ def del_user(username:str,
 
 @router.put("")
 def update_user(
-    username:str,
     payload:schemas.UpdateUserPydantic, 
     db: Session= Depends(get_db),
     currUser:schemas.TokenData = Depends(auth.getCurrentUser)) -> User:
