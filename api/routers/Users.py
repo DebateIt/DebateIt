@@ -30,23 +30,12 @@ def del_user(username:str,
             currUser:schemas.TokenData = Depends(auth.getCurrentUser)):
     return delOneUser(currUser.username,db)
 
-@router.put("/user/{username}")
+@router.put("")
 def update_user(
     username:str,
     payload:schemas.UpdateUserPydantic, 
     db: Session= Depends(get_db),
     currUser:schemas.TokenData = Depends(auth.getCurrentUser)) -> User:
     userDB = updateOneUser(db=db,username=currUser.username,new_user=payload)
-    access_token = auth.create_access_token(data={"username":userDB.username,"id":userDB.id})
-    return schemas.Token(token_content=access_token,token_type="bearer")
-
-
-@router.post("/login")
-def login(userCred:schemas.UserPydantic,db: Session= Depends(get_db)):
-    if not IsUserExist(userCred.username,db):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User Not Found")
-    userDB = getOneUser(userCred.username,db)
-    if not auth.verify_password(userCred.password,userDB.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid Username or Password")
     access_token = auth.create_access_token(data={"username":userDB.username,"id":userDB.id})
     return schemas.Token(token_content=access_token,token_type="bearer")
