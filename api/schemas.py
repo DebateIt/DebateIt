@@ -26,6 +26,15 @@ class CreateUserPydantic(UserPydantic):
         db.close()
         return v
 
+class UserLogin(UserPydantic):
+    @validator('username')
+    def CheckNameExist(cls,v):
+        db = SessionLocal()
+        if not crud.IsUserExist(v,db):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Username Not Exist")
+        db.close()
+        return v
+
 class UpdateUserPydantic(BaseModel):
     new_username:Optional[str] = None
     new_password:Optional[str] = None
