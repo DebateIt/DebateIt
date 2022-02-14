@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI
 
-from .routers import Utils, Users,Auth
+from .routers import Utils, Users, Auth
 from . import models
 from .database import SessionLocal, engine
 

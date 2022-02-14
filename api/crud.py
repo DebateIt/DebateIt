@@ -2,7 +2,7 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 from .models import *
 from fastapi import status, Response
-from . import schemas,auth
+from . import schemas, auth
 
 
 def seed(db: Session) -> None:
@@ -73,15 +73,19 @@ def delOneUser(username: str, db: Session) -> Response:
         status_code=status.HTTP_200_OK, content=f"User {username} is deleted"
     )
 
-  
-def updateOneUser(db:Session,username:str,new_user:schemas.UpdateUserPydantic) -> User:
+
+def updateOneUser(
+    db: Session, username: str, new_user: schemas.UpdateUserPydantic
+) -> User:
     if new_user.new_password is not None:
-        db.query(User).filter(User.username == username)\
-                .update({"password":new_user.new_password},synchronize_session='fetch')
+        db.query(User).filter(User.username == username).update(
+            {"password": new_user.new_password}, synchronize_session="fetch"
+        )
 
     if new_user.new_username is not None:
-        db.query(User).filter(User.username == username)\
-                .update({"username":new_user.new_username},synchronize_session='fetch')
+        db.query(User).filter(User.username == username).update(
+            {"username": new_user.new_username}, synchronize_session="fetch"
+        )
         username = new_user.new_username
 
     db.commit()
@@ -89,8 +93,8 @@ def updateOneUser(db:Session,username:str,new_user:schemas.UpdateUserPydantic) -
     return db.query(User).filter(User.username == username).first()
 
 
-def addOneUser(username:str,password:str,db:Session) -> User:
-    new_user = User(username=username,password=auth.pwd_context.hash(password))
+def addOneUser(username: str, password: str, db: Session) -> User:
+    new_user = User(username=username, password=auth.pwd_context.hash(password))
 
     db.add(new_user)
     db.commit()
