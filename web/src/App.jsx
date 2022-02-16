@@ -1,9 +1,9 @@
 import React from 'react';
 
 import NavBar from './components/navbar';
-import User from './components/User';
-// import Login from './components/Login';
-// import Registration from './components/Registration';
+// import Registration from './pages/Registration';
+// import Login from './pages/Login';
+import User from './pages/User';
 
 function App() {
   return (
