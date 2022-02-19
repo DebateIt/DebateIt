@@ -11,11 +11,15 @@ function NavBar() {
       <div className="is-size-5 my-6">
         ALPACAMAX
       </div>
-      {['Yours', 'Topics', 'Debates'].map((text) => (
-        <div className="py-4 button is-primary is-fullwidth is-family-secondary">
-          {text}
-        </div>
-      ))}
+      <a href="/login" className="py-4 button is-primary is-fullwidth is-family-secondary">
+        Login
+      </a>
+      <a href="/register" className="py-4 button is-primary is-fullwidth is-family-secondary">
+        Register
+      </a>
+      <a href="/user" className="py-4 button is-primary is-fullwidth is-family-secondary">
+        User
+      </a>
     </div>
   );
 }
