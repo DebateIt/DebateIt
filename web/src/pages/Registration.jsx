@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
@@ -8,6 +10,7 @@ function User() {
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
   const [helpInfo, setHelpInfo] = useState('');
+  const navigate = useNavigate();
 
   const fieldOnChange = (setState) => (event) => {
     setState(event.target.value);
@@ -17,7 +20,15 @@ function User() {
     if (password !== repeat) {
       setHelpInfo('Two password have to be the same!');
     }
-    console.log(username, password, repeat);
+
+    axios.post('http://localhost:8000/user', {
+      username,
+      password,
+    }).then(() => {
+      navigate('/login');
+    }).catch((err) => {
+      console.log(err);
+    });
   };
 
   return (
