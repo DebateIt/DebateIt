@@ -32,7 +32,6 @@ def get_user_info(username: str, db: Session = Depends(get_db)) -> User:
 
 @router.delete("")
 def del_user(
-    username: str,
     db: Session = Depends(get_db),
     currUser: schemas.TokenData = Depends(auth.getCurrentUser),
 ):
