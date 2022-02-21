@@ -17,8 +17,9 @@ function User() {
   };
 
   const register = () => {
-    if (password !== repeat) {
-      setHelpInfo('Two password have to be the same!');
+    setHelpInfo(password !== repeat ? 'Two passwords have to be the same!' : '');
+    if (!helpInfo) {
+      return;
     }
 
     axios.post('http://localhost:8000/user', {
@@ -27,7 +28,7 @@ function User() {
     }).then(() => {
       navigate('/login');
     }).catch((err) => {
-      console.log(err);
+      console.log(err.response.data.detail);
     });
   };
 
