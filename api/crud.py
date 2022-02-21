@@ -61,16 +61,12 @@ def is_topic_name_existed(name, db: Session) -> bool:
     return db.query(res.exists()).scalar()
 
 def create_one_topic(name: str, description: str, creator_id: int, num_of_debates: int, db: Session) -> Topic:
-    new_topic = Topic(id=None, name=name, description=description,
+    new_topic = Topic(name=name, description=description,
                       creator_id=creator_id, num_of_debates=num_of_debates)
 
     db.add(new_topic)
     db.commit()
     db.refresh(new_topic)
-
-    # retrieve id using db and put it into new _topic
-    res = db.query(Topic).filter(Topic.name == name).first()
-    new_topic.id = res.id
 
     return new_topic
 
@@ -81,8 +77,8 @@ def update_one_topic(id: int, name: str, description: str, creator_id: int, num_
     # if the topic is still use the old name, skip checking
     # else, check whether the new name is in use
     if name != db.query(Topic).filter(Topic.id == id).first().name:
-        if crud.is_topic_name_existed(v, db):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Name Already Exist")
+        if is_topic_name_existed(name, db):
+            return False
         else:
             db.query(Topic).filter(Topic.id == id).update({"name": name}, synchronize_session="fetch")
             db.commit()
@@ -95,9 +91,9 @@ def update_one_topic(id: int, name: str, description: str, creator_id: int, num_
     return db.query(Topic).filter(Topic.id == id).first()
 
 def delete_one_topic(id: int, db: Session):
-    name = db.query(Topic).filter(Topic.id == id).first().name
+    if id is None or not is_topic_existed(id, db):
+        return False
+
     db.query(Topic).filter(Topic.id == id).delete(synchronize_session="fetch")
     db.commit()
-    return Response(
-        status_code=status.HTTP_200_OK, content=f"Topic #{id} \"{name}\" is deleted."
-    )
+    return True

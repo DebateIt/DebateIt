@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 from .database import SessionLocal
 from typing import Optional
 from fastapi import HTTPException, status
@@ -7,10 +7,10 @@ from . import crud
 
 class Topic(BaseModel):
     id: Optional[int] = None
-    name: Optional[str] = None
+    name: str
     description: Optional[str] = None
-    creator_id: Optional[int] = None
-    num_of_debates: Optional[int] = None
+    creator_id: int
+    num_of_debates: int = Field(ge=0)
 #
 class CreateTopic(Topic):
     # topic id will not be checked
@@ -26,11 +26,11 @@ class CreateTopic(Topic):
         db.close()
         return v
 
-    @validator("num_of_debates")
-    def is_num_of_debates_leq_than_0(cls, v):
-        if v < 0:
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Invalid Input of Number of Debates")
-        return v
+    # @validator("num_of_debates")
+    # def is_num_of_debates_leq_than_0(cls, v):
+    #     if v < 0:
+    #         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Invalid Input of Number of Debates")
+    #     return v
 
     @validator("name")
     def check_topic_name_existed(cls, v):
@@ -53,11 +53,11 @@ class UpdateTopic(Topic):
         db.close()
         return v
 
-    @validator("num_of_debates")
-    def is_num_of_debates_leq_than_0(cls, v):
-        if v < 0:
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Invalid input of number of debates")
-        return v
+    # @validator("num_of_debates")
+    # def is_num_of_debates_leq_than_0(cls, v):
+    #     if v < 0:
+    #         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Invalid input of number of debates")
+    #     return v
 
     @validator("id")
     def is_topic_existed_by_id(cls, v):
@@ -67,8 +67,8 @@ class UpdateTopic(Topic):
         db.close()
         return v
 
-    @validator("name")
-    def check_topic_name_existed(cls, v):
-        if v is None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please Provide a Topic Name")
-        return v
+    # @validator("name")
+    # def check_topic_name_existed(cls, v):
+    #     if v is None:
+    #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please Provide a Topic Name")
+    #     return v
