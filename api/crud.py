@@ -74,21 +74,21 @@ def create_one_topic(name: str, description: str, creator_id: int, num_of_debate
 def get_one_topic(id: int, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == id).first()
 
-def update_one_topic(topic: UpdateTopic, db: Session) -> Topic:
+def update_one_topic(id: int, topic: UpdateTopic, db: Session) -> Topic:
     # if the topic is still use the old name, skip checking
     # else, check whether the new name is in use
     if topic.name != None:
-        if topic.name != db.query(Topic).filter(Topic.id == topic.id).first().name:
+        if topic.name != db.query(Topic).filter(Topic.id == id).first().name:
             if is_topic_name_existed(topic.name, db):
                 return False
 
-    stmt = update(Topic).where(Topic.id == topic.id).\
+    stmt = update(Topic).where(Topic.id == id).\
         values(**(topic.dict(exclude_unset=True))). \
         execution_options(synchronize_session="fetch")
     db.execute(stmt)
     db.commit()
 
-    return db.query(Topic).filter(Topic.id == topic.id).first()
+    return db.query(Topic).filter(Topic.id == id).first()
 
 def delete_one_topic(id: int, db: Session):
     if id is None or not is_topic_existed(id, db):

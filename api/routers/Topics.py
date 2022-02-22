@@ -20,9 +20,12 @@ def get_topic(id: int, db: Session=Depends(get_db)) -> Topic:
     return get_one_topic(id, db)
 
 # Update one topic profile
-@router.put("")
-def update_topic(topic: UpdateTopic, db: Session=Depends(get_db)):
-    res = update_one_topic(topic, db)
+@router.put("/{id}")
+def update_topic(id: int, topic: UpdateTopic, db: Session=Depends(get_db)):
+    if id is None or not crud.is_topic_existed(id, db):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Not Found")
+        
+    res = update_one_topic(id, topic, db)
     if not res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Name Already Exist")
     else:

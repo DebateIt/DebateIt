@@ -37,7 +37,6 @@ class CreateTopic(Topic):
         return v
 
 class UpdateTopic(BaseModel):
-    id: int # id is required for update
     name: Optional[str] = None
     description: Optional[str] = None
     creator_id: Optional[int] = None
@@ -50,13 +49,5 @@ class UpdateTopic(BaseModel):
         db = SessionLocal()
         if not crud.is_user_existed_by_id(v, db):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No Record of the Topic Creator")
-        db.close()
-        return v
-
-    @validator("id")
-    def is_topic_existed_by_id(cls, v):
-        db = SessionLocal()
-        if id is None or not crud.is_topic_existed(v, db):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Not Found")
         db.close()
         return v
