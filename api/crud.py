@@ -1,7 +1,8 @@
-from sqlalchemy import delete
+from sqlalchemy import update, delete
 from sqlalchemy.orm import Session
 from fastapi import status, Response
 from .models import *
+from .schemas import UpdateTopic
 
 def seed(db: Session) -> None:
     # Empty the database
@@ -73,22 +74,21 @@ def create_one_topic(name: str, description: str, creator_id: int, num_of_debate
 def get_one_topic(id: int, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == id).first()
 
-def update_one_topic(id: int, name: str, description: str, creator_id: int, num_of_debates: int, db: Session) -> Topic:
+def update_one_topic(topic: UpdateTopic, db: Session) -> Topic:
     # if the topic is still use the old name, skip checking
     # else, check whether the new name is in use
-    if name != db.query(Topic).filter(Topic.id == id).first().name:
-        if is_topic_name_existed(name, db):
-            return False
-        else:
-            db.query(Topic).filter(Topic.id == id).update({"name": name}, synchronize_session="fetch")
-            db.commit()
+    if topic.name != None:
+        if topic.name != db.query(Topic).filter(Topic.id == topic.id).first().name:
+            if is_topic_name_existed(topic.name, db):
+                return False
 
-    db.query(Topic).filter(Topic.id == id).update(
-        {"description": description, "creator_id": creator_id, "num_of_debates": num_of_debates}, synchronize_session="fetch"
-    )
+    stmt = update(Topic).where(Topic.id == topic.id).\
+        values(**(topic.dict(exclude_unset=True))). \
+        execution_options(synchronize_session="fetch")
+    db.execute(stmt)
     db.commit()
 
-    return db.query(Topic).filter(Topic.id == id).first()
+    return db.query(Topic).filter(Topic.id == topic.id).first()
 
 def delete_one_topic(id: int, db: Session):
     if id is None or not is_topic_existed(id, db):

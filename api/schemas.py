@@ -10,7 +10,7 @@ class Topic(BaseModel):
     name: str
     description: Optional[str] = None
     creator_id: int
-    num_of_debates: int = Field(ge=0)
+    num_of_debates: Optional[int] = Field(0, ge=0)
 #
 class CreateTopic(Topic):
     # topic id will not be checked
@@ -36,7 +36,13 @@ class CreateTopic(Topic):
         db.close()
         return v
 
-class UpdateTopic(Topic):
+class UpdateTopic(BaseModel):
+    id: int # id is required for update
+    name: Optional[str] = None
+    description: Optional[str] = None
+    creator_id: Optional[int] = None
+    num_of_debates: Optional[int] = Field(ge=0)
+
     @validator("creator_id")
     def is_creator_valid(cls, v):
         if v is None:

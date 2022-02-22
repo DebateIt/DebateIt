@@ -22,7 +22,7 @@ def get_topic(id: int, db: Session=Depends(get_db)) -> Topic:
 # Update one topic profile
 @router.put("")
 def update_topic(topic: UpdateTopic, db: Session=Depends(get_db)):
-    res = update_one_topic(topic.id, topic.name, topic.description, topic.creator_id, topic.num_of_debates, db)
+    res = update_one_topic(topic, db)
     if not res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Name Already Exist")
     else:
