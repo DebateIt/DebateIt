@@ -13,7 +13,11 @@ from ..auth import verify_password
 client = TestClient(app)
 global token
 
-def test_get_info():
+@pytest.fixture()
+def init_db():
+    client.get("/utils/seed")
+
+def test_get_info(init_db):
     res = client.get("/user/Alice")
     assert res.json().get("password") == "12345"
     assert res.status_code == 200
