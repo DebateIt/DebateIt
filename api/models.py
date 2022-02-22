@@ -4,12 +4,14 @@ from sqlalchemy.sql import func
 
 from .database import Base
 
+
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True)
     password = Column(String, nullable=False)
+
 
 class Topic(Base):
     __tablename__ = "topics"
@@ -20,6 +22,7 @@ class Topic(Base):
     num_of_debates = Column(Integer, default=0)
 
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
 
 class Debate(Base):
     __tablename__ = "debates"
@@ -33,6 +36,7 @@ class Debate(Base):
     con_user_id = Column(Integer, ForeignKey("users.id"))
     first_recording_id = Column(Integer, ForeignKey("recordings.id"))
     last_recording_id = Column(Integer, ForeignKey("recordings.id"))
+
 
 class Recording(Base):
     __tablename__ = "recordings"
