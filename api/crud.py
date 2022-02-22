@@ -1,9 +1,9 @@
-from sqlalchemy import delete
+from sqlalchemy import update, delete
 from sqlalchemy.orm import Session
-from .models import *
 from fastapi import status, Response
-from . import schemas, auth
 
+from .models import *
+from . import schemas, auth
 
 def seed(db: Session) -> None:
     # Empty the database
@@ -50,6 +50,54 @@ def seed(db: Session) -> None:
     db.refresh(us_china)
     db.refresh(feminism)
 
+def is_user_existed_by_id(id, db: Session) -> bool:
+    res = db.query(User).filter(User.id == id)
+    return db.query(res.exists()).scalar()
+
+def is_topic_existed(id, db: Session) -> bool:
+    res = db.query(Topic).filter(Topic.id == id)
+    return db.query(res.exists()).scalar()
+
+def is_topic_name_existed(name, db: Session) -> bool:
+    res = db.query(Topic).filter(Topic.name == name)
+    return db.query(res.exists()).scalar()
+
+def create_one_topic(name: str, description: str, creator_id: int, num_of_debates: int, db: Session) -> Topic:
+    new_topic = Topic(name=name, description=description,
+                      creator_id=creator_id, num_of_debates=num_of_debates)
+
+    db.add(new_topic)
+    db.commit()
+    db.refresh(new_topic)
+
+    return new_topic
+
+def get_one_topic(id: int, db: Session) -> Topic:
+    return db.query(Topic).filter(Topic.id == id).first()
+
+def update_one_topic(id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:
+    # if the topic is still use the old name, skip checking
+    # else, check whether the new name is in use
+    if topic.name != None:
+        if topic.name != db.query(Topic).filter(Topic.id == id).first().name:
+            if is_topic_name_existed(topic.name, db):
+                return False
+
+    stmt = update(Topic).where(Topic.id == id).\
+        values(**(topic.dict(exclude_unset=True))). \
+        execution_options(synchronize_session="fetch")
+    db.execute(stmt)
+    db.commit()
+
+    return db.query(Topic).filter(Topic.id == id).first()
+
+def delete_one_topic(id: int, db: Session):
+    if id is None or not is_topic_existed(id, db):
+        return False
+
+    db.query(Topic).filter(Topic.id == id).delete(synchronize_session="fetch")
+    db.commit()
+    return True
 
 def IsUserExist(username, db: Session) -> bool:
     if username is None:
