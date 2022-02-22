@@ -58,7 +58,7 @@ def IsUserExist(username, db: Session) -> bool:
     return db.query(existance.exists()).scalar()
 
 
-def getAllUsers(db: Session) -> list[User]:
+def getAllUsers(db: Session):
     return db.query(User).all()
 
 
@@ -100,3 +100,8 @@ def addOneUser(username: str, password: str, db: Session) -> User:
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+def clean_up_user_table(db: Session) -> None:
+    db.query(User).all().delete(synchronize_session="fetch")
+    db.commit()
