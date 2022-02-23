@@ -22,7 +22,7 @@ function InputBox({ name, onChange, helpInfo }) {
               onChange={onChange}
             />
           </p>
-          <p className="help">{ helpInfo }</p>
+          <p className="help is-white">{ helpInfo }</p>
         </div>
       </div>
     </div>

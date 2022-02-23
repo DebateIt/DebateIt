@@ -9,7 +9,8 @@ function User() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
-  const [helpInfo, setHelpInfo] = useState('');
+  const [usernameInfo, setUsernameInfo] = useState('');
+  const [repeatInfo, setRepeatInfo] = useState('');
   const navigate = useNavigate();
 
   const fieldOnChange = (setState) => (event) => {
@@ -17,8 +18,8 @@ function User() {
   };
 
   const register = () => {
-    setHelpInfo(password !== repeat ? 'Two passwords have to be the same!' : '');
-    if (!helpInfo) {
+    if (password !== repeat) {
+      setRepeatInfo('Two passwords have to be the same');
       return;
     }
 
@@ -28,7 +29,7 @@ function User() {
     }).then(() => {
       navigate('/login');
     }).catch((err) => {
-      console.log(err.response.data.detail);
+      setUsernameInfo(err.response.data.detail);
     });
   };
 
@@ -38,6 +39,7 @@ function User() {
         <InputBox
           name="Username"
           onChange={fieldOnChange(setUsername)}
+          helpInfo={usernameInfo}
         />
         <PasswordBox
           name="Password"
@@ -46,7 +48,7 @@ function User() {
         <PasswordBox
           name="__Repeat"
           onChange={fieldOnChange(setRepeat)}
-          helpInfo={helpInfo}
+          helpInfo={repeatInfo}
         />
         <div className="field">
           <div className="field-body">

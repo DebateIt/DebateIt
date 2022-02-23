@@ -22,7 +22,7 @@ function PasswordBox({ name, onChange, helpInfo }) {
               onChange={onChange}
             />
           </p>
-          <p className="help is-success">{ helpInfo }</p>
+          <p className="help is-white">{ helpInfo }</p>
         </div>
       </div>
     </div>
