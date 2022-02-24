@@ -38,7 +38,7 @@ class UserLogin(UserPydantic):
         db = SessionLocal()
         if not crud.IsUserExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Username Not Exist"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Invalid Username or Password"
             )
         db.close()
         return v

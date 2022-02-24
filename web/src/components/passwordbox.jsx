@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function PasswordBox({ name, onChange, helpInfo }) {
+function PasswordBox({ name, onChange, helpInfo, value }) {
   return (
     <div className="field is-horizontal">
       <div className="field-label is-normal">
@@ -20,6 +20,7 @@ function PasswordBox({ name, onChange, helpInfo }) {
               placeholder={name}
               id={name}
               onChange={onChange}
+              value={value}
             />
           </p>
           <p className="help is-white">{ helpInfo }</p>
@@ -32,7 +33,8 @@ function PasswordBox({ name, onChange, helpInfo }) {
 PasswordBox.propTypes = {
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  helpInfo: PropTypes.string.isRequired,
+  helpInfo: PropTypes.string,
+  value: PropTypes.string
 };
 
 export default PasswordBox;

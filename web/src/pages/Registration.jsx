@@ -5,7 +5,7 @@ import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
 
-function User() {
+function Registration() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
@@ -60,4 +60,4 @@ function User() {
   );
 }
 
-export default User;
+export default Registration;
