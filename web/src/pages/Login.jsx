@@ -7,12 +7,12 @@ import Button from '../components/button';
 
 function Login() {
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (localStorage.getItem('access_token') !== null) {
       navigate('/user');
     }
-  })
+  });
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

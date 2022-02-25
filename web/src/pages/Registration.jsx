@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import InputBox from '../components/inputbox';
@@ -6,18 +6,28 @@ import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
 
 function Registration() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('access_token') !== null) {
+      navigate('/user');
+    }
+  });
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
   const [usernameInfo, setUsernameInfo] = useState('');
   const [repeatInfo, setRepeatInfo] = useState('');
-  const navigate = useNavigate();
 
   const fieldOnChange = (setState) => (event) => {
     setState(event.target.value);
   };
 
   const register = () => {
+    setUsernameInfo('');
+    setRepeatInfo('');
+    
     if (password !== repeat) {
       setRepeatInfo('Two passwords have to be the same');
       return;

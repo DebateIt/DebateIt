@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
@@ -8,12 +8,17 @@ import Button from '../components/button';
 
 function User() {
   const navigate = useNavigate();
-  const token_data = localStorage.getItem('access_token');
-  if (token_data === null) {
-    navigate('/login');
-  }
+  const access_token = localStorage.getItem('access_token');
 
-  const [username, setUsername] = useState(jwt_decode(token_data).username);
+  useEffect(() => {
+    if (access_token === null) {
+      navigate('/login');
+    }
+  });
+
+  const [username, setUsername] = useState(
+    access_token !== null ? jwt_decode(access_token).username : ''
+  );
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
   const [usernameInfo, setUsernameInfo] = useState('');
@@ -24,28 +29,25 @@ function User() {
   };
 
   const save = () => {
+    setUsernameInfo('');
+    setRepeatInfo('');
+
     if (password !== repeat) {
       setRepeatInfo('Two passwords have to be the same');
       return;
-    } else {
-      setRepeatInfo('');
     }
 
-    if (!localStorage.getItem('access_token')) {
-      navigate('/login');
-    }
+    const params = {};
 
-    const params = {
-      new_username: username
-    };
+    if (jwt_decode(access_token).username !== username) {
+      params.new_username = username;
+    }
 
     if (password !== '') {
       params.new_password = password;
     }
 
-    axios.put('http://localhost:8000/user', {
-      params
-    }, {
+    axios.put('http://localhost:8000/user', params, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
       },
