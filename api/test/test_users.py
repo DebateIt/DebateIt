@@ -54,7 +54,7 @@ def test_login():
 
     # Pass a username that doesn't exist
     res1 = client.post("/login", json={"username": "Simon", "password": "002"})
-    assert res1.json().get("detail") == "Username Not Exist"
+    assert res1.json().get("detail") == "Invalid Username or Password"
     assert res1.status_code == 400
 
     # Pass a JSON body without a username field

@@ -12,7 +12,7 @@ def login(userCred: schemas.UserLogin, db: Session = Depends(get_db)):
     userDB = crud.getOneUser(userCred.username, db)
     if not auth.verify_password(userCred.password, userDB.password):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid Username or Password",
         )
     access_token = auth.create_access_token(
