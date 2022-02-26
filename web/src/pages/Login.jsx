@@ -60,7 +60,7 @@ function Login({accessToken, resetAccessToken}) {
 }
 
 Login.propTypes = {
-  accessToken: PropTypes.string.isRequired,
+  accessToken: PropTypes.string,
   resetAccessToken: PropTypes.func.isRequired,
 };
 

@@ -67,6 +67,11 @@ function User({accessToken, resetAccessToken}) {
     });
   };
 
+  const logout = () => {
+    localStorage.removeItem('access_token');
+    resetAccessToken();
+  }
+
   return (
     <div className="column is-flex is-flex-direction-column is-align-self-center">
       <div className="container">
@@ -90,7 +95,7 @@ function User({accessToken, resetAccessToken}) {
         <div className="field is-horizontal">
           <div className="field-body">
             <Button name="Save" onClick={save} />
-            <Button name="Logout" />
+            <Button name="Logout" onClick={logout} />
           </div>
         </div>
       </div>
@@ -99,7 +104,7 @@ function User({accessToken, resetAccessToken}) {
 }
 
 User.propTypes = {
-  accessToken: PropTypes.string.isRequired,
+  accessToken: PropTypes.string,
   resetAccessToken: PropTypes.func.isRequired,
 }
 

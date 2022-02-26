@@ -27,7 +27,7 @@ function NavBar({ accessToken }) {
 }
 
 NavBar.propTypes = {
-  accessToken: PropTypes.string.isRequired,
+  accessToken: PropTypes.string,
 };
 
 export default NavBar;
