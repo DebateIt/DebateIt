@@ -2,22 +2,23 @@ import React, { useEffect,useState } from 'react';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+
 import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
 
-function User() {
+function User({accessToken, resetAccessToken}) {
   const navigate = useNavigate();
-  const access_token = localStorage.getItem('access_token');
 
   useEffect(() => {
-    if (access_token === null) {
+    if (accessToken === null) {
       navigate('/login');
     }
   });
 
   const [username, setUsername] = useState(
-    access_token !== null ? jwt_decode(access_token).username : ''
+    accessToken !== null ? jwt_decode(accessToken).username : ''
   );
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
@@ -39,7 +40,7 @@ function User() {
 
     const params = {};
 
-    if (jwt_decode(access_token).username !== username) {
+    if (jwt_decode(accessToken).username !== username) {
       params.new_username = username;
     }
 
@@ -49,13 +50,19 @@ function User() {
 
     axios.put('http://localhost:8000/user', params, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
     }).then((res) => {
       localStorage.setItem('access_token', res.data.token_content);
+      resetAccessToken();
       setPassword('');
       setRepeat('');
     }).catch((err) => {
+      if (err.response.status === 401) { // If the access_token expires
+        localStorage.removeItem('access_token');
+        resetAccessToken();
+        navigate('/login');
+      }
       setUsernameInfo(err.response.data.detail);
     });
   };
@@ -89,6 +96,11 @@ function User() {
       </div>
     </div>
   );
+}
+
+User.propTypes = {
+  accessToken: PropTypes.string.isRequired,
+  resetAccessToken: PropTypes.func.isRequired,
 }
 
 export default User;

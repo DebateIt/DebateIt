@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import PropTypes from 'prop-types';
+
 import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
 
-function Login() {
+function Login({accessToken, resetAccessToken}) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem('access_token') !== null) {
+    if (accessToken !== null) {
       navigate('/user');
     }
   });
@@ -28,6 +30,7 @@ function Login() {
       password,
     }).then((res) => {
       localStorage.setItem('access_token', res.data.token_content);
+      resetAccessToken();
       navigate('/user');
     }).catch((err) => {
       setUsernameInfo(err.response.data.detail);
@@ -55,5 +58,10 @@ function Login() {
     </div>
   );
 }
+
+Login.propTypes = {
+  accessToken: PropTypes.string.isRequired,
+  resetAccessToken: PropTypes.func.isRequired,
+};
 
 export default Login;

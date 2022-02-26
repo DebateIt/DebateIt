@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import jwt_decode from 'jwt-decode';
+import PropTypes from 'prop-types';
 
-function NavBar() {
-  const access_token = localStorage.getItem('access_token');
+function NavBar({ accessToken }) {
 
   return (
     <div
@@ -13,7 +13,7 @@ function NavBar() {
       </div>
       <div className="is-size-5 my-6">
         <a href="/user" className="has-text-white">
-          { access_token !== null ? jwt_decode(access_token).username : 'Anonymous' }
+          { accessToken !== null ? jwt_decode(accessToken).username : 'Anonymous' }
         </a>
       </div>
       <a href="/login" className="py-4 button is-primary is-fullwidth is-family-secondary">
@@ -25,5 +25,9 @@ function NavBar() {
     </div>
   );
 }
+
+NavBar.propTypes = {
+  accessToken: PropTypes.string.isRequired,
+};
 
 export default NavBar;
