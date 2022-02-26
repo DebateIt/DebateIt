@@ -88,13 +88,17 @@ def get_one_topic(id: int, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == id).first()
 
 
-def update_one_topic(id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:
+def update_one_topic(id: int, topic: schemas.UpdateTopic, userId: int, db: Session) -> Topic:
     # if the topic is still use the old name, skip checking
     # else, check whether the new name is in use
     if topic.name != None:
         if topic.name != db.query(Topic).filter(Topic.id == id).first().name:
             if is_topic_name_existed(topic.name, db):
                 return False
+
+    # check whether the user of "userId" owns the topic of "id"
+    if userId != db.query(Topic).filter(Topic.id == id).first().creator_id:
+        return False
 
     stmt = (
         update(Topic)
@@ -108,8 +112,12 @@ def update_one_topic(id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == id).first()
 
 
-def delete_one_topic(id: int, db: Session):
+def delete_one_topic(id: int, userId: int, db: Session):
     if id is None or not is_topic_existed(id, db):
+        return False
+
+    # check whether the user of "userId" owns the topic of "id"
+    if userId != db.query(Topic).filter(Topic.id == id).first().creator_id:
         return False
 
     db.query(Topic).filter(Topic.id == id).delete(synchronize_session="fetch")

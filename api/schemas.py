@@ -14,25 +14,10 @@ class Topic(BaseModel):
     num_of_debates: Optional[int] = Field(0, ge=0)
 
 
-class CreateTopic(Topic):
-    # topic id will not be checked
-    # since id will be automatically assigned to a new topic
-
-    @validator("creator_id")
-    def is_creator_valid(cls, v):
-        if v is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Please Provide the Topic Creator",
-            )
-        db = SessionLocal()
-        if not crud.is_user_existed_by_id(v, db):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No Record of the Topic Creator",
-            )
-        db.close()
-        return v
+class CreateTopic(BaseModel):
+    name: str
+    description: Optional[str] = None
+    num_of_debates: Optional[int] = Field(0, ge=0)
 
     @validator("name")
     def check_topic_name_existed(cls, v):
@@ -54,43 +39,8 @@ class CreateTopic(Topic):
 class UpdateTopic(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    creator_id: int
     num_of_debates: Optional[int] = Field(ge=0)
 
-    @validator("creator_id")
-    def is_creator_valid(cls, v):
-        if v is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Please Provide the Topic Creator",
-            )
-        db = SessionLocal()
-        if not crud.is_user_existed_by_id(v, db):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No Record of the Topic Creator",
-            )
-        db.close()
-        return v
-
-class DeleteTopic(BaseModel):
-    creator_id: int
-
-    @validator("creator_id")
-    def is_creator_valid(cls, v):
-        if v is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Please Provide the Topic Creator",
-            )
-        db = SessionLocal()
-        if not crud.is_user_existed_by_id(v, db):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No Record of the Topic Creator",
-            )
-        db.close()
-        return v
 
 class UserPydantic(BaseModel):
     id: Optional[int] = None
