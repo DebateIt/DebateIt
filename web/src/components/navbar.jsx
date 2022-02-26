@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import jwt_decode from 'jwt-decode';
 import PropTypes from 'prop-types';
 
 function NavBar({ accessToken }) {
-
   return (
     <div
       className="column p-0 is-1 is-flex is-flex-direction-column is-align-items-center has-background-primary has-text-light"

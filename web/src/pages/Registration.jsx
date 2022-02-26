@@ -27,7 +27,7 @@ function Registration() {
   const register = () => {
     setUsernameInfo('');
     setRepeatInfo('');
-    
+
     if (password !== repeat) {
       setRepeatInfo('Two passwords have to be the same');
       return;

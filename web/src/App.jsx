@@ -15,7 +15,7 @@ function App() {
   const resetAccessToken = () => {
     setAccessToken(localStorage.getItem('access_token'));
   };
-  
+
   return (
     <div className="App columns m-0">
       <NavBar accessToken={accessToken} />
@@ -23,12 +23,12 @@ function App() {
         <Routes>
           <Route
             path="login"
-            element={
+            element={(
               <Login
                 accessToken={accessToken}
                 resetAccessToken={resetAccessToken}
               />
-            }
+            )}
           />
           <Route
             path="register"
@@ -38,12 +38,12 @@ function App() {
           />
           <Route
             path="user"
-            element={
+            element={(
               <User
                 accessToken={accessToken}
                 resetAccessToken={resetAccessToken}
               />
-            }
+            )}
           />
         </Routes>
       </BrowserRouter>

@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
 
-function User({accessToken, resetAccessToken}) {
+function User({ accessToken, resetAccessToken }) {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +18,7 @@ function User({accessToken, resetAccessToken}) {
   });
 
   const [username, setUsername] = useState(
-    accessToken !== null ? jwt_decode(accessToken).username : ''
+    accessToken !== null ? jwt_decode(accessToken).username : '',
   );
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
@@ -50,7 +50,7 @@ function User({accessToken, resetAccessToken}) {
 
     axios.put('http://localhost:8000/user', params, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     }).then((res) => {
       localStorage.setItem('access_token', res.data.token_content);
@@ -70,7 +70,7 @@ function User({accessToken, resetAccessToken}) {
   const logout = () => {
     localStorage.removeItem('access_token');
     resetAccessToken();
-  }
+  };
 
   return (
     <div className="column is-flex is-flex-direction-column is-align-self-center">
@@ -106,6 +106,6 @@ function User({accessToken, resetAccessToken}) {
 User.propTypes = {
   accessToken: PropTypes.string,
   resetAccessToken: PropTypes.func.isRequired,
-}
+};
 
 export default User;

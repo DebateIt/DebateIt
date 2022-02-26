@@ -7,7 +7,7 @@ import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
 
-function Login({accessToken, resetAccessToken}) {
+function Login({ accessToken, resetAccessToken }) {
   const navigate = useNavigate();
 
   useEffect(() => {
