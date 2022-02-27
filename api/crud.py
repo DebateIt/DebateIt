@@ -125,12 +125,6 @@ def IsUserExist(username, db: Session) -> bool:
     existance = db.query(User).filter(User.username == username)
     return db.query(existance.exists()).scalar()
 
-def IsUserIdExists(id,db:Session) -> bool:
-    if id is None:
-        return False
-    existance = db.query(User).filter(User.id == id)
-    return db.query(existance.exists()).scalar()
-
 def getAllUsers(db: Session):
     return db.query(User).all()
 
@@ -173,13 +167,7 @@ def addOneUser(username: str, password: str, db: Session) -> User:
     db.commit()
     db.refresh(new_user)
     return new_user
-
-
-def clean_up_user_table(db: Session) -> None:
-    db.query(User).all().delete(synchronize_session="fetch")
-    db.commit()
-
-
+    
 def IsDebateIdExist(id,db):
     res = db.query(Debate).filter(Debate.id == id)
     return db.query(res.exists()).scalar()
@@ -207,9 +195,7 @@ def addOneDebate(userId:int,payload:schemas.Debate,db:Session) -> Debate:
 def delOneDebate(id,db:Session)->None:
     db.query(Debate).filter(Debate.id == id).delete(synchronize_session="fetch")
     db.commit()
-    return Response(
-        status_code=status.HTTP_200_OK, content=f"Debate {id} is deleted"
-    )
+    
 
 def updateOneDebate(payload:schemas.UpdateDebate,db:Session):
     db.query(Debate).filter(Debate.id == payload.id).update(

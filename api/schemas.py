@@ -249,23 +249,21 @@ class ExitDebate(BaseModel):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Pro and Con Cannot be None at same time"
             )
-        elif pro is None and con is not None:
-            db = SessionLocal()
-            debate = crud.getOneDebate(id,db)
+        db = SessionLocal()
+        debate = crud.getOneDebate(id,db)
+        db.close()
+        if pro is None and con:
+            
             if debate.con_user_id is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Con Position Is None, cannot exit"
                 )
-            db.close()
             return values
-        elif pro is not None and con is None:
-            db = SessionLocal()
-            debate = crud.getOneDebate(id,db)
+        elif pro and con is None:
             if debate.pro_user_id is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Pro Position is None, Cannot Exit"
                 )
-            db.close()
             return values
         else:
             raise HTTPException(

@@ -15,7 +15,7 @@ def add_new_debate(
 ):
     return addOneDebate(currUser.id, payload,db)
 
-@router.put("/join", status_code=status.HTTP_200_OK)
+@router.post("/join", status_code=status.HTTP_200_OK)
 def join_debate(
     payload: schemas.JoinDebate,
     db: Session = Depends(get_db),
@@ -23,7 +23,7 @@ def join_debate(
 ):
     return userJoinDebate(currUser.id,payload,db)
 
-@router.put("/exit", status_code=status.HTTP_200_OK)
+@router.post("/exit", status_code=status.HTTP_200_OK)
 def leave_debate(
     payload: schemas.ExitDebate,
     db: Session = Depends(get_db),
@@ -47,7 +47,10 @@ def del_debate(
 ):
     if currUser.username != "Admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Only Admin can delete debate")
-    return delOneDebate(id, db)
+    delOneDebate(id, db)
+    return Response(
+        status_code=status.HTTP_200_OK, content=f"Debate {id} is deleted"
+    )
 
 @router.put("")
 def update_debate(
