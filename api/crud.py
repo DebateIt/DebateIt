@@ -14,12 +14,14 @@ def seed(db: Session) -> None:
     db.commit()
 
     # Create Users
-    alice = User(username="Alice", password="12345")
+    alice = User(username="Alice", password=auth.pwd_context.hash("alice"))
     db.add(alice)
-    bob = User(username="Bob", password="1234125")
+    bob = User(username="Bob", password=auth.pwd_context.hash("bob"))
     db.add(bob)
-    eve = User(username="Eve", password="13412423")
+    eve = User(username="Eva", password=auth.pwd_context.hash("eva"))
     db.add(eve)
+    Admin = User(username="Admin", password=auth.pwd_context.hash("admin"))
+    db.add(Admin)
 
     db.commit()
     db.refresh(alice)
@@ -123,8 +125,8 @@ def IsUserExist(username, db: Session) -> bool:
     existance = db.query(User).filter(User.username == username)
     return db.query(existance.exists()).scalar()
 
-
-def getAllUsers(db: Session):
+#For the return type of this one
+def getAllUsers(db: Session) -> list[User]:
     return db.query(User).all()
 
 
@@ -166,8 +168,79 @@ def addOneUser(username: str, password: str, db: Session) -> User:
     db.commit()
     db.refresh(new_user)
     return new_user
+    
+def IsDebateIdExist(id,db) -> bool:
+    res = db.query(Debate).filter(Debate.id == id)
+    return db.query(res.exists()).scalar()
 
+def getOneDebate(id,db) -> Debate:
+    return db.query(Debate).filter(Debate.id == id).first()
 
-def clean_up_user_table(db: Session) -> None:
-    db.query(User).all().delete(synchronize_session="fetch")
+def addOneDebate(userId:int,payload:schemas.Debate,db:Session) -> Debate:
+    topic_info = get_one_topic(payload.topic_id,db)
+    new_num = topic_info.num_of_debates +1
+
+    update_one_topic(payload.topic_id,schemas.UpdateTopic(num_of_debates=new_num),db)
+
+    if payload.as_pro:
+        new_Debate = Debate(topic_id=payload.topic_id,
+            nth_time_of_debate=new_num,
+            pro_user_id =userId,)
+    elif payload.as_con:
+        new_Debate = Debate(topic_id=payload.topic_id,
+            nth_time_of_debate=new_num,
+            con_user_id=userId)
+
+    db.add(new_Debate)
     db.commit()
+    db.refresh(new_Debate)
+
+    return new_Debate
+
+def delOneDebate(id,db:Session)->None:
+    db.query(Debate).filter(Debate.id == id).delete(synchronize_session="fetch")
+    db.commit()
+    
+
+def updateOneDebate(payload:schemas.UpdateDebate,db:Session) -> Debate:
+    db.query(Debate).filter(Debate.id == payload.id).update(
+            {"start_time": payload.new_start_time,
+            "first_recording_id":payload.new_first_recording_id,
+            "last_recording_id":payload.new_last_recording_id}
+            , synchronize_session="fetch"
+        )
+    db.commit()
+    return getOneDebate(payload.id,db)
+    
+def userJoinDebate(userID,payload,db) -> Debate:
+    if payload.as_pro:
+        db.query(Debate).filter(Debate.id == payload.id).update(
+            {"pro_user_id": userID}, synchronize_session="fetch"
+        )
+    elif payload.as_con:
+        db.query(Debate).filter(Debate.id == payload.id).update(
+            {"con_user_id": userID}, synchronize_session="fetch"
+        )
+
+    db.commit()
+
+    return getOneDebate(payload.id,db)
+
+# 后面要继续改，处理结束debate和离开debate的问题
+def userExitDebate(userID,payload,db):
+    if payload.as_pro:
+        db.query(Debate).filter(Debate.id == payload.id).update(
+            {"pro_user_id": None}, synchronize_session="fetch"
+        )
+    elif payload.as_con:
+        db.query(Debate).filter(Debate.id == payload.id).update(
+            {"con_user_id": None}, synchronize_session="fetch"
+        )
+
+    db.commit()
+
+    new_deb = getOneDebate(payload.id,db)
+    if new_deb.con_user_id is None and new_deb.pro_user_id is None:
+        return delOneDebate(new_deb.id,db)
+    else:
+        return new_deb
