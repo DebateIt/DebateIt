@@ -125,6 +125,7 @@ def IsUserExist(username, db: Session) -> bool:
     existance = db.query(User).filter(User.username == username)
     return db.query(existance.exists()).scalar()
 
+#For the return type of this one
 def getAllUsers(db: Session):
     return db.query(User).all()
 
@@ -168,7 +169,7 @@ def addOneUser(username: str, password: str, db: Session) -> User:
     db.refresh(new_user)
     return new_user
     
-def IsDebateIdExist(id,db):
+def IsDebateIdExist(id,db) -> bool:
     res = db.query(Debate).filter(Debate.id == id)
     return db.query(res.exists()).scalar()
 
@@ -178,7 +179,9 @@ def getOneDebate(id,db) -> Debate:
 def addOneDebate(userId:int,payload:schemas.Debate,db:Session) -> Debate:
     topic_info = get_one_topic(payload.topic_id,db)
     new_num = topic_info.num_of_debates +1
+
     update_one_topic(payload.topic_id,schemas.UpdateTopic(num_of_debates=new_num),db)
+
     if payload.as_pro:
         new_Debate = Debate(topic_id=payload.topic_id,
             nth_time_of_debate=new_num,
@@ -187,9 +190,11 @@ def addOneDebate(userId:int,payload:schemas.Debate,db:Session) -> Debate:
         new_Debate = Debate(topic_id=payload.topic_id,
             nth_time_of_debate=new_num,
             con_user_id=userId)
+
     db.add(new_Debate)
     db.commit()
     db.refresh(new_Debate)
+
     return new_Debate
 
 def delOneDebate(id,db:Session)->None:
@@ -197,7 +202,7 @@ def delOneDebate(id,db:Session)->None:
     db.commit()
     
 
-def updateOneDebate(payload:schemas.UpdateDebate,db:Session):
+def updateOneDebate(payload:schemas.UpdateDebate,db:Session) -> Debate:
     db.query(Debate).filter(Debate.id == payload.id).update(
             {"start_time": payload.new_start_time,
             "first_recording_id":payload.new_first_recording_id,
@@ -207,15 +212,19 @@ def updateOneDebate(payload:schemas.UpdateDebate,db:Session):
     db.commit()
     return getOneDebate(payload.id,db)
     
-def userJoinDebate(userID,payload,db):
+def userJoinDebate(userID,payload,db) -> Debate:
     if payload.as_pro:
+
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": userID}, synchronize_session="fetch"
         )
+
     elif payload.as_con:
+
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"con_user_id": userID}, synchronize_session="fetch"
         )
+
     db.commit()
     return getOneDebate(payload.id,db)
 

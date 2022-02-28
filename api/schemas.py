@@ -203,28 +203,35 @@ class JoinDebate(BaseModel):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Pro and Con Cannot be None at same time"
             )
-        elif pro is None and con is not None:
-            db = SessionLocal()
-            debate = crud.getOneDebate(id,db)
+        elif pro and con:
+            raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Both Pro and Con Entered"
+                )
+        
+        db = SessionLocal()
+        debate = crud.getOneDebate(id,db)
+        db.close()
+        
+        if pro is None:
             if debate.con_user_id is not None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Con Position Unavailable"
                 )
-            db.close()
+            elif debate.con_user_id == pro:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="You Cannot take two sides!"
+                )
             return values
-        elif pro is not None and con is None:
-            db = SessionLocal()
-            debate = crud.getOneDebate(id,db)
+        elif con is None:
             if debate.pro_user_id is not None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Pro Position Unavailable"
                 )
-            db.close()
-            return values
-        else:
-            raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail="Both Pro and Con entered"
+            elif debate.pro_user_id == con:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="You Cannot take two sides!"
                 )
+            return values
 
 class ExitDebate(BaseModel):
     id:int
@@ -249,23 +256,24 @@ class ExitDebate(BaseModel):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Pro and Con Cannot be None at same time"
             )
+        elif pro and con:
+            raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Both Pro and Con Entered"
+                )
+        
         db = SessionLocal()
         debate = crud.getOneDebate(id,db)
         db.close()
-        if pro is None and con:
-            
+
+        if pro is None:  
             if debate.con_user_id is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Con Position Is None, cannot exit"
                 )
             return values
-        elif pro and con is None:
+        elif con is None:
             if debate.pro_user_id is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Pro Position is None, Cannot Exit"
                 )
             return values
-        else:
-            raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail="Both Pro and Con Entered"
-                )
