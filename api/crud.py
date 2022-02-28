@@ -125,7 +125,8 @@ def IsUserExist(username, db: Session) -> bool:
     existance = db.query(User).filter(User.username == username)
     return db.query(existance.exists()).scalar()
 
-#For the return type of this one
+
+# For the return type of this one
 def getAllUsers(db: Session) -> list[User]:
     return db.query(User).all()
 
@@ -168,28 +169,33 @@ def addOneUser(username: str, password: str, db: Session) -> User:
     db.commit()
     db.refresh(new_user)
     return new_user
-    
-def IsDebateIdExist(id,db) -> bool:
+
+
+def IsDebateIdExist(id, db) -> bool:
     res = db.query(Debate).filter(Debate.id == id)
     return db.query(res.exists()).scalar()
 
-def getOneDebate(id,db) -> Debate:
+
+def getOneDebate(id, db) -> Debate:
     return db.query(Debate).filter(Debate.id == id).first()
 
-def addOneDebate(userId:int,payload:schemas.Debate,db:Session) -> Debate:
-    topic_info = get_one_topic(payload.topic_id,db)
-    new_num = topic_info.num_of_debates +1
 
-    update_one_topic(payload.topic_id,schemas.UpdateTopic(num_of_debates=new_num),db)
+def addOneDebate(userId: int, payload: schemas.Debate, db: Session) -> Debate:
+    topic_info = get_one_topic(payload.topic_id, db)
+    new_num = topic_info.num_of_debates + 1
+
+    update_one_topic(payload.topic_id, schemas.UpdateTopic(num_of_debates=new_num), db)
 
     if payload.as_pro:
-        new_Debate = Debate(topic_id=payload.topic_id,
+        new_Debate = Debate(
+            topic_id=payload.topic_id,
             nth_time_of_debate=new_num,
-            pro_user_id =userId,)
+            pro_user_id=userId,
+        )
     elif payload.as_con:
-        new_Debate = Debate(topic_id=payload.topic_id,
-            nth_time_of_debate=new_num,
-            con_user_id=userId)
+        new_Debate = Debate(
+            topic_id=payload.topic_id, nth_time_of_debate=new_num, con_user_id=userId
+        )
 
     db.add(new_Debate)
     db.commit()
@@ -197,22 +203,26 @@ def addOneDebate(userId:int,payload:schemas.Debate,db:Session) -> Debate:
 
     return new_Debate
 
-def delOneDebate(id,db:Session)->None:
+
+def delOneDebate(id, db: Session) -> None:
     db.query(Debate).filter(Debate.id == id).delete(synchronize_session="fetch")
     db.commit()
-    
 
-def updateOneDebate(payload:schemas.UpdateDebate,db:Session) -> Debate:
+
+def updateOneDebate(payload: schemas.UpdateDebate, db: Session) -> Debate:
     db.query(Debate).filter(Debate.id == payload.id).update(
-            {"start_time": payload.new_start_time,
-            "first_recording_id":payload.new_first_recording_id,
-            "last_recording_id":payload.new_last_recording_id}
-            , synchronize_session="fetch"
-        )
+        {
+            "start_time": payload.new_start_time,
+            "first_recording_id": payload.new_first_recording_id,
+            "last_recording_id": payload.new_last_recording_id,
+        },
+        synchronize_session="fetch",
+    )
     db.commit()
-    return getOneDebate(payload.id,db)
-    
-def userJoinDebate(userID,payload,db) -> Debate:
+    return getOneDebate(payload.id, db)
+
+
+def userJoinDebate(userID, payload, db) -> Debate:
     if payload.as_pro:
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": userID}, synchronize_session="fetch"
@@ -224,10 +234,11 @@ def userJoinDebate(userID,payload,db) -> Debate:
 
     db.commit()
 
-    return getOneDebate(payload.id,db)
+    return getOneDebate(payload.id, db)
+
 
 # 后面要继续改，处理结束debate和离开debate的问题
-def userExitDebate(userID,payload,db):
+def userExitDebate(userID, payload, db):
     if payload.as_pro:
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": None}, synchronize_session="fetch"
@@ -239,8 +250,8 @@ def userExitDebate(userID,payload,db):
 
     db.commit()
 
-    new_deb = getOneDebate(payload.id,db)
+    new_deb = getOneDebate(payload.id, db)
     if new_deb.con_user_id is None and new_deb.pro_user_id is None:
-        return delOneDebate(new_deb.id,db)
+        return delOneDebate(new_deb.id, db)
     else:
         return new_deb

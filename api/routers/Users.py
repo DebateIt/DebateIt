@@ -49,4 +49,3 @@ def update_user(
         data={"username": userDB.username, "id": userDB.id}
     )
     return schemas.Token(token_content=access_token, token_type="bearer")
-
