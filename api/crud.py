@@ -126,7 +126,7 @@ def IsUserExist(username, db: Session) -> bool:
     return db.query(existance.exists()).scalar()
 
 #For the return type of this one
-def getAllUsers(db: Session):
+def getAllUsers(db: Session) -> list[User]:
     return db.query(User).all()
 
 
