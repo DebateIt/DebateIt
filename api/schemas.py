@@ -217,7 +217,7 @@ class JoinDebate(BaseModel):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Con Position Unavailable"
                 )
-            elif debate.con_user_id == pro:
+            elif debate.pro_user_id == con:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="You Cannot take two sides!"
                 )
@@ -227,7 +227,7 @@ class JoinDebate(BaseModel):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Pro Position Unavailable"
                 )
-            elif debate.pro_user_id == con:
+            elif debate.con_user_id == pro:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="You Cannot take two sides!"
                 )

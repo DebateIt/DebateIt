@@ -214,20 +214,19 @@ def updateOneDebate(payload:schemas.UpdateDebate,db:Session) -> Debate:
     
 def userJoinDebate(userID,payload,db) -> Debate:
     if payload.as_pro:
-
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": userID}, synchronize_session="fetch"
         )
-
     elif payload.as_con:
-
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"con_user_id": userID}, synchronize_session="fetch"
         )
 
     db.commit()
+
     return getOneDebate(payload.id,db)
 
+# 后面要继续改，处理结束debate和离开debate的问题
 def userExitDebate(userID,payload,db):
     if payload.as_pro:
         db.query(Debate).filter(Debate.id == payload.id).update(
@@ -237,7 +236,9 @@ def userExitDebate(userID,payload,db):
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"con_user_id": None}, synchronize_session="fetch"
         )
+
     db.commit()
+
     new_deb = getOneDebate(payload.id,db)
     if new_deb.con_user_id is None and new_deb.pro_user_id is None:
         return delOneDebate(new_deb.id,db)
