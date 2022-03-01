@@ -9,14 +9,14 @@ from . import crud, auth
 class Topic(BaseModel):
     id: Optional[int] = None
     name: str
-    description: Optional[str] = None
+    description: Optional[str] = ""
     creator_id: int
     num_of_debates: Optional[int] = Field(0, ge=0)
 
 
 class CreateTopic(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: Optional[str] = ""
     num_of_debates: Optional[int] = Field(0, ge=0)
 
     @validator("name")
@@ -38,7 +38,7 @@ class CreateTopic(BaseModel):
 
 class UpdateTopic(BaseModel):
     name: Optional[str] = None
-    description: Optional[str] = None
+    description: Optional[str] = ""
     num_of_debates: Optional[int] = Field(ge=0)
 
 

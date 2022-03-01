@@ -7,6 +7,13 @@ from ..crud import *
 
 router = APIRouter(prefix="/topic")
 
+# check whether the user of "creator_id" owns the topic of "topic_id"
+def own_topic(topic_id: int, creator_id: int, db: Session):
+    if creator_id != db.query(Topic).filter(Topic.id == topic_id).first().creator_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Topic Not Created by the Current User"
+        )
 
 # Create one topic
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -18,42 +25,53 @@ def create_topic(topic: CreateTopic, db: Session = Depends(get_db),
 
 
 # Get one topic profile
-@router.get("/{id}")
-def get_topic(id: int, db: Session = Depends(get_db)) -> Topic:
-    if id is None or not is_topic_existed(id, db):
+@router.get("/{topic_id}")
+def get_topic(topic_id: int, db: Session = Depends(get_db)) -> Topic:
+    if topic_id is None or not is_topic_existed(topic_id, db):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"
         )
-    return get_one_topic(id, db)
+    return get_one_topic(topic_id, db)
 
 
 # Update one topic profile
-@router.put("/{id}")
-def update_topic(id: int, topic: UpdateTopic, db: Session = Depends(get_db),
+@router.put("/{topic_id}") # topic_id
+def update_topic(topic_id: int, topic: UpdateTopic, db: Session = Depends(get_db),
                  currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> Topic:
-    if id is None or not crud.is_topic_existed(id, db):
+    if topic_id is None or not crud.is_topic_existed(topic_id, db):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Not Found"
         )
 
-    res = update_one_topic(id, topic, currUser.id, db)
-    if not res:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Name Already Exist or Not Created by the Current User"
-        )
-    else:
-        return res
+    # if the topic still uses the old name, skip checking
+    # else, check whether the new name is in use
+    if topic.name != None:
+        if topic.name != db.query(Topic).filter(Topic.id == topic_id).first().name:
+            if is_topic_name_existed(topic.name, db):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Topic Name Already Exist"
+                )
+
+    # check whether the user of "currUser.id" owns the topic of "topic_id"
+    own_topic(topic_id, currUser.id, db)
+
+    res = update_one_topic(topic_id, topic, db)
+    return res
 
 
 # Delete a topic
-@router.delete("/{id}")
-def delete_topic(id: int, db: Session = Depends(get_db),
-                 currUser: schemas.TokenData = Depends(auth.getCurrentUser)):
-    if delete_one_topic(id, currUser.id, db):
+@router.delete("/{topic_id}")
+def delete_topic(topic_id: int, db: Session = Depends(get_db),
+                 currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> Response:
+    # check whether the user of "currUser.id" owns the topic of "topic_id"
+    own_topic(topic_id, currUser.id, db)
+
+    if delete_one_topic(topic_id, db):
         return Response(
-            status_code=status.HTTP_200_OK, content=f"Topic #{id} is deleted."
+            status_code=status.HTTP_200_OK, content=f"Topic #{topic_id} is deleted."
         )
     else:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found or Not Created by the Current User"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"
         )
