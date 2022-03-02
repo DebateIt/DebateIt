@@ -54,24 +54,23 @@ def seed(db: Session) -> None:
     db.refresh(feminism)
 
 
-def is_user_existed_by_id(id, db: Session) -> bool:
-    res = db.query(User).filter(User.id == id)
+def is_user_existed_by_id(user_id, db: Session) -> bool:
+    res = db.query(User).filter(User.id == user_id)
     return db.query(res.exists()).scalar()
 
 
-def is_topic_existed(id, db: Session) -> bool:
-    res = db.query(Topic).filter(Topic.id == id)
+def is_topic_existed(topic_id, db: Session) -> bool:
+    res = db.query(Topic).filter(Topic.id == topic_id)
     return db.query(res.exists()).scalar()
 
 
-def is_topic_name_existed(name, db: Session) -> bool:
-    res = db.query(Topic).filter(Topic.name == name)
+def is_topic_name_existed(topic_name, db: Session) -> bool:
+    res = db.query(Topic).filter(Topic.name == topic_name)
     return db.query(res.exists()).scalar()
 
 
-def create_one_topic(
-    name: str, description: str, creator_id: int, num_of_debates: int, db: Session
-) -> Topic:
+def create_one_topic(name: str, description: str, creator_id: int,
+                     num_of_debates: int, db: Session) -> Topic:
     new_topic = Topic(
         name=name,
         description=description,
@@ -86,35 +85,28 @@ def create_one_topic(
     return new_topic
 
 
-def get_one_topic(id: int, db: Session) -> Topic:
-    return db.query(Topic).filter(Topic.id == id).first()
+def get_one_topic(topic_id: int, db: Session) -> Topic:
+    return db.query(Topic).filter(Topic.id == topic_id).first()
 
 
-def update_one_topic(id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:
-    # if the topic is still use the old name, skip checking
-    # else, check whether the new name is in use
-    if topic.name != None:
-        if topic.name != db.query(Topic).filter(Topic.id == id).first().name:
-            if is_topic_name_existed(topic.name, db):
-                return False
-
+def update_one_topic(topic_id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:
     stmt = (
         update(Topic)
-        .where(Topic.id == id)
+        .where(Topic.id == topic_id)
         .values(**(topic.dict(exclude_unset=True)))
         .execution_options(synchronize_session="fetch")
     )
     db.execute(stmt)
     db.commit()
 
-    return db.query(Topic).filter(Topic.id == id).first()
+    return db.query(Topic).filter(Topic.id == topic_id).first()
 
 
-def delete_one_topic(id: int, db: Session):
-    if id is None or not is_topic_existed(id, db):
+def delete_one_topic(topic_id: int, db: Session) -> bool:
+    if topic_id is None or not is_topic_existed(topic_id, db):
         return False
 
-    db.query(Topic).filter(Topic.id == id).delete(synchronize_session="fetch")
+    db.query(Topic).filter(Topic.id == topic_id).delete(synchronize_session="fetch")
     db.commit()
     return True
 
