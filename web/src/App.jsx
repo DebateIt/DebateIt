@@ -9,6 +9,8 @@ import NavBar from './components/navbar';
 import Registration from './pages/Registration';
 import Login from './pages/Login';
 import User from './pages/User';
+import Intro from './pages/Intro';
+import TopicCreate from './pages/TopicCreate';
 
 function App() {
   const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
@@ -21,6 +23,10 @@ function App() {
       <NavBar accessToken={accessToken} />
       <BrowserRouter>
         <Routes>
+          <Route
+            path="/"
+            element={(<TopicCreate />)}
+          />
           <Route
             path="login"
             element={(
