@@ -8,7 +8,9 @@ function NavBar({ accessToken }) {
       className="column p-0 is-1 is-flex is-flex-direction-column is-align-items-center has-background-primary has-text-light"
     >
       <div className="is-size-3 mt-5">
-        Debate It
+        <a href="/" className="has-text-white">
+          Debate It
+        </a>
       </div>
       <div className="is-size-5 my-6">
         <a href="/user" className="has-text-white">
@@ -27,6 +29,10 @@ function NavBar({ accessToken }) {
 
 NavBar.propTypes = {
   accessToken: PropTypes.string,
+};
+
+NavBar.defaultProps = {
+  accessToken: null,
 };
 
 export default NavBar;
