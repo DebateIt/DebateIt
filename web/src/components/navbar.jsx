@@ -31,4 +31,8 @@ NavBar.propTypes = {
   accessToken: PropTypes.string,
 };
 
+NavBar.defaultProps = {
+  accessToken: null,
+};
+
 export default NavBar;
