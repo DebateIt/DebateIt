@@ -25,7 +25,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={(<TopicCreate />)}
+            element={(<TopicCreate accessToken={accessToken} />)}
           />
           <Route
             path="login"
