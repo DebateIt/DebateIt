@@ -3,12 +3,15 @@ from ..main import app
 from ..database import SessionLocal
 import pytest
 from ..auth import verify_password
+from .. import crud
 
 client = TestClient(app)
 global token1
 global token2
 global debateID
 global debateID2
+global aliceID
+global bobID
 
 def helper(res):
     print(res)
@@ -43,6 +46,15 @@ def test_add_debate():
     global token1
     global debateID
     global debateID2
+    global aliceID
+    global bobID
+    
+    alice = client.get("/user/Alice")
+    aliceID = alice.json().get("id")
+    bob = client.get("/user/Bob")
+    bobID = bob.json().get("id")
+    assert aliceID is not None
+
     res = client.post("/debate",
         json={"topic_id":1,"as_pro":True,"start_time":"2022-03-16T12:20:00"},
         headers={"Authorization": "Bearer " + token1})
@@ -50,7 +62,7 @@ def test_add_debate():
     assert debateID is not None
     assert res.json().get("nth_time_of_debate") is 1
     assert res.json().get("topic_id") is 1
-    assert res.json().get("pro_user_id") is 1
+    assert res.json().get("pro_user_id") is aliceID
     assert res.json().get("con_user_id") is None
     assert res.json().get("first_recording_id") is None
     assert res.json().get("last_recording_id") is None
@@ -104,12 +116,13 @@ def test_join_debate():
     global token2
     global debateID
     global debateID2
+    global bobID
 
     res = client.post("/debate/join",
         json={"id":debateID,"as_con":True},
         headers={"Authorization": "Bearer " + token2})
     assert res.status_code == 200
-    assert res.json().get("con_user_id") ==2
+    assert res.json().get("con_user_id") == bobID
     assert res.json().get("status") ==2
 
     res2 = client.post("/debate/join",

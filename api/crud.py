@@ -14,13 +14,13 @@ def seed(db: Session) -> None:
     db.commit()
 
     # Create Users
-    alice = User(id=1,username="Alice", password=auth.pwd_context.hash("alice"))
+    alice = User(username="Alice", password=auth.pwd_context.hash("alice"))
     db.add(alice)
-    bob = User(id=2,username="Bob", password=auth.pwd_context.hash("bob"))
+    bob = User(username="Bob", password=auth.pwd_context.hash("bob"))
     db.add(bob)
-    eve = User(id=3,username="Eva", password=auth.pwd_context.hash("eva"))
+    eve = User(username="Eva", password=auth.pwd_context.hash("eva"))
     db.add(eve)
-    Admin = User(id=4,username="Admin", password=auth.pwd_context.hash("admin"))
+    Admin = User(username="Admin", password=auth.pwd_context.hash("admin"))
     db.add(Admin)
 
     db.commit()
@@ -74,7 +74,7 @@ def is_topic_name_existed(name, db: Session) -> bool:
 
 def create_one_topic(
     name: str, description: str, creator_id: int, num_of_debates: int, db: Session
-) -> Topic:
+    ) -> Topic:
     new_topic = Topic(
         name=name,
         description=description,
