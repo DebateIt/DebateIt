@@ -32,6 +32,21 @@ def leave_debate(
     db: Session = Depends(get_db),
     currUser: schemas.TokenData = Depends(auth.getCurrentUser),
 ):
+    # Make sure the one want to leave is in the debate
+    theDebate = getOneDebate(payload.id,db)
+    if payload.as_pro:
+        if currUser.id is not theDebate.pro_user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=f"Pro User Doesn't Match"
+            )
+    elif payload.as_con:
+        if currUser.id is not theDebate.con_user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=f"Con User Doesn't Match"
+            )
+
+    # 而且一方退出之后，另一方应该有一个倒数多少秒，
+    # 然后Admin调用update api来做这件事
     return userExitDebate(currUser.id, payload, db)
 
 

@@ -15,7 +15,7 @@ def init_db():
 
 def test_get_info(init_db):
     res = client.get("/user/Alice")
-    assert res.json().get("password") == "12345"
+    assert verify_password("alice", res.json().get("password")) is True
     assert res.status_code == 200
 
     # Pass a username that doesn't exist

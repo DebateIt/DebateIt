@@ -3,7 +3,7 @@ from pydantic import BaseModel, validator, root_validator, Field
 from .database import SessionLocal
 from typing import Optional
 from fastapi import HTTPException, status
-from . import crud, auth
+from . import crud, auth,models
 from datetime import datetime
 
 
@@ -165,9 +165,36 @@ class Debate(BaseModel):
         db.close()
         return v
 
+    @validator("start_time")
+    def check_time(cls, v):
+        if v < datetime.now():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Start Time Need to Be Later",
+            )
+        return v
+
+    @root_validator
+    def check_pro_con(cls, values):
+        id = values.get("id")
+        pro, con = values.get("as_pro"), values.get("as_con")
+
+        if pro is None and con is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Both Pro and Con are None",
+            )
+        elif pro and con:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Both Pro and Con Entered",
+            )
+        return values
+
 
 class UpdateDebate(BaseModel):
     id: int
+    new_status:Optional[models.Status] = None
     new_start_time: Optional[int] = None
     new_first_recording_id: Optional[int] = None
     new_last_recording_id: Optional[int] = None
@@ -202,6 +229,7 @@ class JoinDebate(BaseModel):
     def check_user_id(cls, values):
         id = values.get("id")
         pro, con = values.get("as_pro"), values.get("as_con")
+
         if pro is None and con is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -217,30 +245,23 @@ class JoinDebate(BaseModel):
         debate = crud.getOneDebate(id, db)
         db.close()
 
-        if pro is None:
-            if debate.con_user_id is not None:
-                raise HTTPException(
+        if debate.status is not models.Status.BeforeDebate:
+            raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Con Position Unavailable",
+                    detail="Wrong Debate Status, Cannot Join Now"
                 )
-            elif debate.pro_user_id == con:
-                raise HTTPException(
+
+        if pro is None and debate.con_user_id is not None:
+            raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="You Cannot take two sides!",
+                    detail="Con Position Unavailable"
                 )
-            return values
-        elif con is None:
-            if debate.pro_user_id is not None:
-                raise HTTPException(
+        elif con is None and debate.pro_user_id is not None:
+            raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Pro Position Unavailable",
+                    detail="Pro Position Unavailable"
                 )
-            elif debate.con_user_id == pro:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="You Cannot take two sides!",
-                )
-            return values
+        return values
 
 
 class ExitDebate(BaseModel):
@@ -252,6 +273,7 @@ class ExitDebate(BaseModel):
     def check_debateID_existance(cls, v):
         db = SessionLocal()
         if not crud.IsDebateIdExist(v, db):
+            print(f"Now value is {v}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
             )
@@ -262,6 +284,7 @@ class ExitDebate(BaseModel):
     def check_different_user_id(cls, values):
         id = values.get("id")
         pro, con = values.get("as_pro"), values.get("as_con")
+
         if pro is None and con is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -277,17 +300,22 @@ class ExitDebate(BaseModel):
         debate = crud.getOneDebate(id, db)
         db.close()
 
-        if pro is None:
-            if debate.con_user_id is None:
-                raise HTTPException(
+        # 只有Finish的时候才不能再做任何退出操作了，
+        # 其他的状态都有对应的情况
+        if debate.status is models.Status.Finish:
+            raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Wrong Debate Status, Cannot Leave Now"
+                )
+
+        if pro is None and debate.con_user_id is None:
+            raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Con Position Is None, cannot exit",
                 )
-            return values
-        elif con is None:
-            if debate.pro_user_id is None:
-                raise HTTPException(
+        elif con is None and debate.pro_user_id is None:
+            raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Pro Position is None, Cannot Exit",
                 )
-            return values
+        return values
