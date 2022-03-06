@@ -273,7 +273,6 @@ class ExitDebate(BaseModel):
     def check_debateID_existance(cls, v):
         db = SessionLocal()
         if not crud.IsDebateIdExist(v, db):
-            print(f"Now value is {v}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
             )
