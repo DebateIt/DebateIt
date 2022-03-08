@@ -74,7 +74,7 @@ def test_update_user():
     global token
     res = client.put(
         "/user",
-        json={"new_username": "Simon002New", "new_password": "002New"},
+        json={"username": "Simon002New", "password": "002New"},
         headers={"Authorization": "Bearer " + token},
     )
     token = res.json().get("token_content")
@@ -83,7 +83,7 @@ def test_update_user():
     # Pass a username that conflicts with an existing one
     res1 = client.put(
         "/user",
-        json={"new_username": "Alice", "new_password": "Conflicts"},
+        json={"username": "Alice", "password": "Conflicts"},
         headers={"Authorization": "Bearer " + token},
     )
     assert res1.status_code == 400
@@ -91,7 +91,7 @@ def test_update_user():
 
     # Send the request without providing a token
     res2 = client.put(
-        "/user", json={"new_username": "Alice", "new_password": "Conflicts"}
+        "/user", json={"username": "Alice", "password": "Conflicts"}
     )
     assert res2.status_code == 401
     assert res2.json().get("detail") == "Not authenticated"
@@ -99,7 +99,7 @@ def test_update_user():
     # Pass new_username with the current username
     res3 = client.put(
         "/user",
-        json={"new_username": "Simon002New", "new_password": "002New"},
+        json={"username": "Simon002New", "password": "002New"},
         headers={"Authorization": "Bearer " + token},
     )
     assert res3.status_code == 400
@@ -108,7 +108,7 @@ def test_update_user():
     # Pass a JSON body without new_username field
     res4 = client.put(
         "/user",
-        json={"new_password": "002NewNew"},
+        json={"password": "002NewNew"},
         headers={"Authorization": "Bearer " + token},
     )
     token = res4.json().get("token_content")
@@ -117,7 +117,7 @@ def test_update_user():
     # Pass a JSON body without password field
     res5 = client.put(
         "/user",
-        json={"new_username": "Simon002NewNew"},
+        json={"username": "Simon002NewNew"},
         headers={"Authorization": "Bearer " + token},
     )
     token = res5.json().get("token_content")

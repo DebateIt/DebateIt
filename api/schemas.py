@@ -115,10 +115,10 @@ class UserLogin(UserPydantic):
 
 
 class UpdateUserPydantic(BaseModel):
-    new_username: Optional[str] = None
-    new_password: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
 
-    @validator("new_username")
+    @validator("username")
     def CheckNameExist(cls, v):
         db = SessionLocal()
         if crud.IsUserExist(v, db):
@@ -128,7 +128,7 @@ class UpdateUserPydantic(BaseModel):
         db.close()
         return v
 
-    @validator("new_password")
+    @validator("password")
     def passwd_cannot_be_None(cls, v):
         if v is None or v == "":
             raise HTTPException(
@@ -194,10 +194,10 @@ class Debate(BaseModel):
 
 class UpdateDebate(BaseModel):
     id: int
-    new_status:Optional[models.Status] = None
-    new_start_time: Optional[int] = None
-    new_first_recording_id: Optional[int] = None
-    new_last_recording_id: Optional[int] = None
+    status:Optional[models.Status] = None
+    start_time: Optional[int] = None
+    first_recording_id: Optional[int] = None
+    last_recording_id: Optional[int] = None
 
     @validator("id")
     def check_debateID_existance(cls, v):
@@ -299,8 +299,7 @@ class ExitDebate(BaseModel):
         debate = crud.getOneDebate(id, db)
         db.close()
 
-        # 只有Finish的时候才不能再做任何退出操作了，
-        # 其他的状态都有对应的情况
+        # FINISHED -> Can do Nothing
         if debate.status is models.Status.Finish:
             raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
