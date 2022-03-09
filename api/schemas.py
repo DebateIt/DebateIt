@@ -3,7 +3,7 @@ from pydantic import BaseModel, validator, root_validator, Field
 from .database import SessionLocal
 from typing import Optional
 from fastapi import HTTPException, status
-from . import crud, auth,models
+from . import crud, auth, models
 from datetime import datetime
 
 
@@ -162,7 +162,7 @@ class Debate(BaseModel):
 
 class UpdateDebate(BaseModel):
     id: int
-    status:Optional[models.Status] = None
+    status: Optional[models.Status] = None
     start_time: Optional[int] = None
     first_recording_id: Optional[int] = None
     last_recording_id: Optional[int] = None
@@ -215,20 +215,20 @@ class JoinDebate(BaseModel):
 
         if debate.status is not models.Status.BeforeDebate:
             raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Wrong Debate Status, Cannot Join Now"
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Wrong Debate Status, Cannot Join Now",
+            )
 
         if pro is None and debate.con_user_id is not None:
             raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Con Position Unavailable"
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Con Position Unavailable",
+            )
         elif con is None and debate.pro_user_id is not None:
             raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Pro Position Unavailable"
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Pro Position Unavailable",
+            )
         return values
 
 
@@ -270,18 +270,18 @@ class ExitDebate(BaseModel):
         # FINISHED -> Can do Nothing
         if debate.status is models.Status.Finish:
             raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Wrong Debate Status, Cannot Leave Now"
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Wrong Debate Status, Cannot Leave Now",
+            )
 
         if pro is None and debate.con_user_id is None:
             raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Con Position Is None, cannot exit",
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Con Position Is None, cannot exit",
+            )
         elif con is None and debate.pro_user_id is None:
             raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Pro Position is None, Cannot Exit",
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Pro Position is None, Cannot Exit",
+            )
         return values

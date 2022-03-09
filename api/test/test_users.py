@@ -90,9 +90,7 @@ def test_update_user():
     assert res1.json().get("detail") == "Username Already Exist"
 
     # Send the request without providing a token
-    res2 = client.put(
-        "/user", json={"username": "Alice", "password": "Conflicts"}
-    )
+    res2 = client.put("/user", json={"username": "Alice", "password": "Conflicts"})
     assert res2.status_code == 401
     assert res2.json().get("detail") == "Not authenticated"
 

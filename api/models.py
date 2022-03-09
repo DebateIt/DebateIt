@@ -1,9 +1,19 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, Enum, DateTime, LargeBinary
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    Text,
+    Enum,
+    DateTime,
+    LargeBinary,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
 
 from .database import Base
+
 
 class Status(enum.Enum):
     BeforeDebate = 1
@@ -14,6 +24,7 @@ class Status(enum.Enum):
     # End is when debate ends, one party has left
     # finish is when both left
     # when changing the Type, old type in the database need to be droped
+
 
 class User(Base):
     __tablename__ = "users"
@@ -40,7 +51,7 @@ class Debate(Base):
     id = Column(Integer, primary_key=True, index=True)
     nth_time_of_debate = Column(Integer, nullable=False)
     start_time = Column(DateTime(timezone=True), server_default=func.now())
-    status = Column(Enum(Status),default=Status.BeforeDebate)
+    status = Column(Enum(Status), default=Status.BeforeDebate)
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     pro_user_id = Column(Integer, ForeignKey("users.id"))
     con_user_id = Column(Integer, ForeignKey("users.id"))
