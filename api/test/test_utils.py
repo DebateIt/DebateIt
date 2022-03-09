@@ -13,5 +13,5 @@ def test_seed():
     response = client.get("/utils/seed")
     assert response.status_code == 200
     assert response.json() == {"msg": "Success!"}
-    assert db.query(User).count() == 3
+    assert db.query(User).count() == 4
     assert db.query(Topic).count() == 3

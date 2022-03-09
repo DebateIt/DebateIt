@@ -1,7 +1,7 @@
 from sqlalchemy import update, delete
 from sqlalchemy.orm import Session
-from fastapi import status, Response
-
+from fastapi import status, Response,HTTPException
+from datetime import datetime
 from .models import *
 from . import schemas, auth
 
@@ -53,6 +53,27 @@ def seed(db: Session) -> None:
     db.refresh(us_china)
     db.refresh(feminism)
 
+    debate1 = Debate(
+        nth_time_of_debate = 1,
+        start_time = datetime(2022,5,15,10,0,0),
+        status= Status.BeforeDebate,
+        topic_id = slur.id,
+        pro_user_id = alice.id,
+        con_user_id = bob.id,
+    )
+    debate2 = Debate(
+        nth_time_of_debate = 1,
+        start_time = datetime(2022,5,15,10,0,0),
+        status= Status.BeforeDebate,
+        topic_id = us_china.id,
+        pro_user_id = bob.id,
+        con_user_id = eve.id,
+    )
+    db.add(debate1)
+    db.add(debate2)
+    db.commit()
+    db.refresh(debate1)
+    db.refresh(debate2)
 
 def is_user_existed_by_id(user_id, db: Session) -> bool:
     res = db.query(User).filter(User.id == user_id)
@@ -71,7 +92,7 @@ def is_topic_name_existed(topic_name, db: Session) -> bool:
 
 def create_one_topic(
     name: str, description: str, creator_id: int, num_of_debates: int, db: Session
-) -> Topic:
+    ) -> Topic:
     new_topic = Topic(
         name=name,
         description=description,
@@ -88,6 +109,9 @@ def create_one_topic(
 
 def get_one_topic(topic_id: int, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == topic_id).first()
+
+def getOneTopicByName(name: str, db: Session) -> Topic:
+    return db.query(Topic).filter(Topic.name == name).first()
 
 
 def update_one_topic(topic_id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:
@@ -131,28 +155,20 @@ def getOneUser(username: str, db: Session) -> User:
 def delOneUser(username: str, db: Session) -> Response:
     db.query(User).filter(User.username == username).delete(synchronize_session="fetch")
     db.commit()
-    return Response(
-        status_code=status.HTTP_200_OK, content=f"User {username} is deleted"
-    )
+    return True
 
 
 def updateOneUser(
     db: Session, username: str, new_user: schemas.UpdateUserPydantic
 ) -> User:
-    if new_user.new_password is not None:
+    update_data = new_user.dict(exclude_unset=True)
+    if update_data != {}:
         db.query(User).filter(User.username == username).update(
-            {"password": new_user.new_password}, synchronize_session="fetch"
-        )
+                update_data, synchronize_session="fetch",)
 
-    if new_user.new_username is not None:
-        db.query(User).filter(User.username == username).update(
-            {"username": new_user.new_username}, synchronize_session="fetch"
-        )
-        username = new_user.new_username
-
-    db.commit()
-
-    return db.query(User).filter(User.username == username).first()
+        db.commit()
+    new_name = new_user.username or username
+    return db.query(User).filter(User.username == new_name).first()
 
 
 def addOneUser(username: str, password: str, db: Session) -> User:
@@ -167,7 +183,6 @@ def addOneUser(username: str, password: str, db: Session) -> User:
 def IsDebateIdExist(id, db) -> bool:
     res = db.query(Debate).filter(Debate.id == id)
     return db.query(res.exists()).scalar()
-
 
 def getOneDebate(id, db) -> Debate:
     return db.query(Debate).filter(Debate.id == id).first()
@@ -189,6 +204,8 @@ def addOneDebate(userId: int, payload: schemas.Debate, db: Session) -> Debate:
         new_Debate = Debate(
             topic_id=payload.topic_id, nth_time_of_debate=new_num, con_user_id=userId
         )
+    if payload.start_time:
+        new_Debate.start_time = payload.start_time
 
     db.add(new_Debate)
     db.commit()
@@ -197,40 +214,50 @@ def addOneDebate(userId: int, payload: schemas.Debate, db: Session) -> Debate:
     return new_Debate
 
 
-def delOneDebate(id, db: Session) -> None:
+def delOneDebate(id, db: Session) -> bool:
     db.query(Debate).filter(Debate.id == id).delete(synchronize_session="fetch")
     db.commit()
+    return True
 
 
 def updateOneDebate(payload: schemas.UpdateDebate, db: Session) -> Debate:
-    db.query(Debate).filter(Debate.id == payload.id).update(
-        {
-            "start_time": payload.new_start_time,
-            "first_recording_id": payload.new_first_recording_id,
-            "last_recording_id": payload.new_last_recording_id,
-        },
-        synchronize_session="fetch",
-    )
-    db.commit()
+    update_data = payload.dict(exclude_unset=True)
+
+    if update_data != {}:
+        db.query(Debate).filter(Debate.id == payload.id).update(
+            update_data,
+            synchronize_session="fetch",
+        )
+        db.commit()
     return getOneDebate(payload.id, db)
 
 
 def userJoinDebate(userID, payload, db) -> Debate:
-    if payload.as_pro:
+    # By this point, there must have been someone on one side 
+    # and the other side joined
+
+    # in schemas we can't find if pro&con are the same,
+    # so we need a check here
+    theDebate = getOneDebate(payload.id,db)
+    if payload.as_pro and theDebate.con_user_id != userID:
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": userID}, synchronize_session="fetch"
         )
-    elif payload.as_con:
+    elif payload.as_con and theDebate.pro_user_id != userID:
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"con_user_id": userID}, synchronize_session="fetch"
         )
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot take both sides of Debate")
 
     db.commit()
+
+    updateOneDebate(schemas.UpdateDebate(id=payload.id,status=Status.InProgress),db)
 
     return getOneDebate(payload.id, db)
 
 
-# 后面要继续改，处理结束debate和离开debate的问题
 def userExitDebate(userID, payload, db):
     if payload.as_pro:
         db.query(Debate).filter(Debate.id == payload.id).update(
@@ -244,7 +271,15 @@ def userExitDebate(userID, payload, db):
     db.commit()
 
     new_deb = getOneDebate(payload.id, db)
-    if new_deb.con_user_id is None and new_deb.pro_user_id is None:
+
+    # This paragraph as a whole are idealized, but after that can continue to design
+    if new_deb.status is Status.End:
+        # End -> Another Party Leave debate -> change status to FINISHED
+        return updateOneDebate(schemas.UpdateDebate(id=payload.id ,status=Status.Finish),db)
+    elif new_deb.status is Status.BeforeDebate and\
+        new_deb.con_user_id is None and new_deb.pro_user_id is None:
+        # Another Party Not Joined & Creator Leaves -> delete this debate
         return delOneDebate(new_deb.id, db)
     else:
-        return new_deb
+        # Debate is over -> one party left first. 
+        return updateOneDebate(schemas.UpdateDebate(id=payload.id ,status=Status.End),db)
