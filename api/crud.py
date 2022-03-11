@@ -237,7 +237,7 @@ def updateOneDebate(payload: schemas.UpdateDebate, db: Session) -> Debate:
     return getOneDebate(payload.id, db)
 
 
-def userJoinDebate(userID, payload, db) -> Debate:
+def userJoinDebate(userID, payload:schemas.JoinDebate, db: Session) -> Debate:
     # By this point, there must have been someone on one side
     # and the other side joined
 
@@ -265,7 +265,7 @@ def userJoinDebate(userID, payload, db) -> Debate:
     return getOneDebate(payload.id, db)
 
 
-def userExitDebate(userID, payload, db):
+def userExitDebate(userID, payload:schemas.ExitDebate, db: Session):
     if payload.as_pro:
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": None}, synchronize_session="fetch"
@@ -297,3 +297,33 @@ def userExitDebate(userID, payload, db):
         return updateOneDebate(
             schemas.UpdateDebate(id=payload.id, status=Status.End), db
         )
+
+def IsRecIdExist(id, db) -> bool:
+    res = db.query(Recording).filter(Recording.id == id)
+    return db.query(res.exists()).scalar()
+
+def getOneRec(id:int,db:Session) -> Recording:
+    return db.query(Recording).filter(Recording.id == id).first()
+
+def addOneRec(userID:int,payload:schemas.Recording,db:Session) -> Recording:
+    data = payload.dict(exclude_unset=True)
+    new_Rec = Recording(**data)
+    db.add(new_Rec)
+    db.commit()
+    db.refresh(new_Rec)
+    return new_Rec
+
+def delOneRec(id, db: Session) -> bool:
+    db.query(Recording).filter(Recording.id == id).delete(synchronize_session="fetch")
+    db.commit()
+    return True
+
+def linkRecs(userID:int, payload:schemas.LinkRecording, db:Session):
+    update_data = payload.dict(exclude_unset=True)
+    if update_data != {}:
+        db.query(Recording).filter(Recording.id == payload.id).update(
+            update_data,
+            synchronize_session="fetch",
+        )
+        db.commit()
+    return getOneRec(payload.id, db)

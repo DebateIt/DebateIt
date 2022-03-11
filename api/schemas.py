@@ -285,3 +285,90 @@ class ExitDebate(BaseModel):
                 detail="Pro Position is None, Cannot Exit",
             )
         return values
+
+class Recording(BaseModel):
+    debate_id:int
+    audio_content: bytes
+    user_id:int
+    prev_recording_id:Optional[int] = None
+
+    @root_validator
+    def check_user_debate(cls, values):
+        userID = values.get("user_id")
+        debateID = values.get("debate_id")
+        db = SessionLocal()
+        if not crud.IsDebateIdExist(debateID, db):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
+            )
+        if not crud.is_user_existed_by_id(userID,db):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="User Not Exist"
+            )
+        theDebate = crud.getOneDebate(debateID,db)
+        if userID != theDebate.con_user_id and userID != theDebate.pro_user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate and User not Match"
+            )
+        db.close()
+        return values
+    
+    @validator("prev_recording_id")
+    def check_prev_ID_existance(cls, v):
+        db = SessionLocal()
+        if not crud.IsRecIdExist(v, db):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Recording Not Exist"
+            )
+        db.close()
+        return v
+
+
+class LinkRecording(BaseModel):
+    id:int
+    prev_recording_id: Optional[int] = None
+    next_recording_id: Optional[int] = None
+
+    @validator("id")
+    def check_rec_existance(cls, v):
+        db = SessionLocal()
+        if not crud.IsRecIdExist(v, db):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Recording Not Exist"
+            )
+        db.close()
+        return v
+
+    @root_validator
+    def check_user_debate(cls, values):
+        recID = values.get("id")
+        prevID = values.get("prev_recording_id")
+        nextID = values.get("next_recording_id")
+        db = SessionLocal()
+
+        if prevID is None and nextID is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Prev and Next Cannot be both None",
+            )
+        theRec = crud.getOneRec(recID,db)
+        if prevID is not None:
+            if not crud.IsRecIdExist(prevID, db):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Prev Recording ID Not Exist"
+                )
+            if theRec.prev_recording_id is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Prev Position Unavailable, use Update instead"
+                )
+        if nextID is not None:
+            if not crud.IsRecIdExist(nextID, db):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Next Recording ID Not Exist"
+                )
+            if theRec.next_recording_id is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Next Position Unavailable, use Update instead"
+                )
+        db.close()
+        return values
