@@ -7,11 +7,13 @@ from ..crud import *
 
 router = APIRouter(prefix="/recording")
 
+
 @router.post("", status_code=status.HTTP_201_CREATED)
-def add_new_rec(payload:schemas.Recording,
-        db:Session= Depends(get_db),
-        visitUser: schemas.TokenData = Depends(auth.getCurrentUser)
-        ) -> models.Recording:
+def add_new_rec(
+    payload: schemas.Recording,
+    db: Session = Depends(get_db),
+    visitUser: schemas.TokenData = Depends(auth.getCurrentUser),
+) -> models.Recording:
     if visitUser.username != "Admin":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -29,6 +31,7 @@ def get_Rec_info(id: int, db: Session = Depends(get_db)) -> models.Recording:
         )
 
     return getOneRec(id, db)
+
 
 @router.delete("/{id}")
 def del_Rec(
@@ -52,16 +55,19 @@ def del_Rec(
             detail=f"delete failed",
         )
 
+
 # This One serves as regular link Rec to prev&next
 # Usually being used, a seperate update will serve as
 # Rec editor & Admin usage
 @router.post("/link", status_code=status.HTTP_200_OK)
-def link_Rec(payload:schemas.LinkRecording,
-        db:Session= Depends(get_db),
-        visitUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> models.Recording:
-        if visitUser.username != "Admin":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Only Admin can link debate",
-            )
-        return linkRecs(visitUser.id, payload, db)
+def link_Rec(
+    payload: schemas.LinkRecording,
+    db: Session = Depends(get_db),
+    visitUser: schemas.TokenData = Depends(auth.getCurrentUser),
+) -> models.Recording:
+    if visitUser.username != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Only Admin can link debate",
+        )
+    return linkRecs(visitUser.id, payload, db)

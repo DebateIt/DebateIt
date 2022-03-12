@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import Utils, Topics, Users, Auth, Debates,Recordings
+from .routers import Utils, Topics, Users, Auth, Debates, Recordings
 from . import models
 from .database import SessionLocal, engine
 
