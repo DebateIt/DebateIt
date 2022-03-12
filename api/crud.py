@@ -2,6 +2,8 @@ from sqlalchemy import update, delete
 from sqlalchemy.orm import Session
 from fastapi import status, Response, HTTPException
 from datetime import datetime
+
+from api.database import SessionLocal
 from .models import *
 from . import schemas, auth
 
@@ -18,15 +20,15 @@ def seed(db: Session) -> None:
     db.add(alice)
     bob = User(username="Bob", password=auth.pwd_context.hash("bob"))
     db.add(bob)
-    eve = User(username="Eva", password=auth.pwd_context.hash("eva"))
-    db.add(eve)
+    eva = User(username="Eva", password=auth.pwd_context.hash("eva"))
+    db.add(eva)
     Admin = User(username="Admin", password=auth.pwd_context.hash("admin"))
     db.add(Admin)
 
     db.commit()
     db.refresh(alice)
     db.refresh(bob)
-    db.refresh(eve)
+    db.refresh(eva)
 
     # Create Topics
     slur = Topic(
@@ -44,7 +46,7 @@ def seed(db: Session) -> None:
     feminism = Topic(
         name="Is feminism about female dominance?",
         description="asdfasdfasdfasdfas",
-        creator_id=eve.id,
+        creator_id=eva.id,
     )
     db.add(feminism)
 
@@ -67,7 +69,7 @@ def seed(db: Session) -> None:
         status=Status.BeforeDebate,
         topic_id=us_china.id,
         pro_user_id=bob.id,
-        con_user_id=eve.id,
+        con_user_id=eva.id,
     )
     db.add(debate1)
     db.add(debate2)
@@ -192,6 +194,9 @@ def IsDebateIdExist(id, db) -> bool:
 def getOneDebate(id, db) -> Debate:
     return db.query(Debate).filter(Debate.id == id).first()
 
+def getOneDebateByTopicId(topicID:int,db:Session) -> Debate:
+    #For Test Only
+    return db.query(Debate).filter(Debate.topic_id == topicID).first()
 
 def addOneDebate(userId: int, payload: schemas.Debate, db: Session) -> Debate:
     topic_info = get_one_topic(payload.topic_id, db)
@@ -237,7 +242,7 @@ def updateOneDebate(payload: schemas.UpdateDebate, db: Session) -> Debate:
     return getOneDebate(payload.id, db)
 
 
-def userJoinDebate(userID, payload, db) -> Debate:
+def userJoinDebate(userID, payload:schemas.JoinDebate, db: Session) -> Debate:
     # By this point, there must have been someone on one side
     # and the other side joined
 
@@ -265,7 +270,7 @@ def userJoinDebate(userID, payload, db) -> Debate:
     return getOneDebate(payload.id, db)
 
 
-def userExitDebate(userID, payload, db):
+def userExitDebate(userID, payload:schemas.ExitDebate, db: Session):
     if payload.as_pro:
         db.query(Debate).filter(Debate.id == payload.id).update(
             {"pro_user_id": None}, synchronize_session="fetch"
@@ -297,3 +302,94 @@ def userExitDebate(userID, payload, db):
         return updateOneDebate(
             schemas.UpdateDebate(id=payload.id, status=Status.End), db
         )
+
+def IsRecIdExist(id, db) -> bool:
+    res = db.query(Recording).filter(Recording.id == id)
+    return db.query(res.exists()).scalar()
+
+def getOneRec(id:int,db:Session) -> Recording:
+    return db.query(Recording).filter(Recording.id == id).first()
+
+def addOneRec(userID:int,payload:schemas.Recording,db:Session) -> Recording:
+    data = payload.dict(exclude_unset=True)
+    new_Rec = Recording(**data)
+    db.add(new_Rec)
+    db.commit()
+    db.refresh(new_Rec)
+    return new_Rec
+
+def delOneRec(id, db: Session) -> bool:
+    theRec = getOneRec(id,db)
+    thePrevID = theRec.prev_recording_id
+    theNextID = theRec.next_recording_id
+
+    
+
+    res = updateLink(db,prevID=thePrevID,nextID=theNextID)
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error During Updating Link")
+
+    db.query(Recording).filter(Recording.id == id).delete(synchronize_session="fetch")
+    db.commit()
+    return True
+
+def linkRecs(userID:int, payload:schemas.LinkRecording, db:Session):
+    update_data = payload.dict(exclude_unset=True)
+    if update_data != {}:
+        db.query(Recording).filter(Recording.id == payload.id).update(
+            update_data,
+            synchronize_session="fetch",
+        )
+        db.commit()
+    if payload.prev_recording_id is not None:
+        res = coLinkRecs(schemas.CoLinkRecording
+            (id=payload.prev_recording_id,next_recording_id=payload.id),db)
+        if not res:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Co-Link Prev Failed",
+        )
+    
+    if payload.next_recording_id is not None:
+        res = coLinkRecs(schemas.CoLinkRecording
+            (id=payload.next_recording_id,prev_recording_id=payload.id),db)
+        if not res:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Co-Link Next Failed",
+        )
+
+    return getOneRec(payload.id, db)
+
+def coLinkRecs(payload:schemas.CoLinkRecording,db:Session):
+    update_data = payload.dict(exclude_unset=True)
+    if update_data != {}:
+        db.query(Recording).filter(Recording.id == payload.id).update(
+            update_data,
+            synchronize_session="fetch",
+        )
+        db.commit()
+    return True
+
+def updateLink(db:Session, prevID=None,nextID = None) -> bool:
+    if prevID is None and nextID is None:
+        if prevID is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Should Provide prev or next")
+    if prevID:
+        db.query(Recording).filter(Recording.id == prevID).update(
+            {"next_recording_id":None},
+            synchronize_session="fetch",
+        )
+        db.commit()
+    if nextID:
+        db.query(Recording).filter(Recording.id == nextID).update(
+            {"prev_recording_id":None},
+            synchronize_session="fetch",
+        )
+        db.commit()
+    return True
+    
