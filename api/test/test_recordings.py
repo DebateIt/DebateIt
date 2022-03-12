@@ -220,4 +220,3 @@ def test_del_rec():
     thePrev = client.get(f"/recording/{recID1}")
     assert thePrev.json().get("next_recording_id") is None
     
-    # 删除中间的需要额外的提醒吗

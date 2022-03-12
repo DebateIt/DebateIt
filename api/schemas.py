@@ -375,7 +375,6 @@ class LinkRecording(BaseModel):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Next and Current Recordings Have Different Debate ID"
                 )
-            # 这里不对，需要再建一个class来处理coLink的问题
             if theNextRec.prev_recording_id is not None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Next Recording's Prev Unavailable'"

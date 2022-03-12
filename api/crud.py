@@ -371,7 +371,6 @@ def coLinkRecs(payload:schemas.CoLinkRecording,db:Session):
             synchronize_session="fetch",
         )
         db.commit()
-    # 需要问一下，这种return True的地方，应该在返回的那个地方怎么改一改？
     return True
 
 def updateLink(db:Session, prevID=None,nextID = None) -> bool:

@@ -12,8 +12,6 @@ def add_new_rec(payload:schemas.Recording,
         db:Session= Depends(get_db),
         visitUser: schemas.TokenData = Depends(auth.getCurrentUser)
         ) -> models.Recording:
-        # 没想好这里是怎么做，我觉得user ID应该在payload里面
-        # 外面这个currUser是验证创建者权利的
     if visitUser.username != "Admin":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
