@@ -14,6 +14,11 @@ def add_new_rec(payload:schemas.Recording,
         ) -> models.Recording:
         # 没想好这里是怎么做，我觉得user ID应该在payload里面
         # 外面这个currUser是验证创建者权利的
+    if visitUser.username != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Only Admin can add debate",
+        )
     return addOneRec(visitUser.id, payload, db)
 
 
@@ -56,4 +61,9 @@ def del_Rec(
 def link_Rec(payload:schemas.LinkRecording,
         db:Session= Depends(get_db),
         visitUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> models.Recording:
+        if visitUser.username != "Admin":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Only Admin can link debate",
+            )
         return linkRecs(visitUser.id, payload, db)

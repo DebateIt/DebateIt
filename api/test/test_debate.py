@@ -16,17 +16,12 @@ global topicID
 global topicID2
 
 
-def helper(res):
-    print(res)
-    print(res.json())
-
-
 @pytest.fixture()
 def init_db():
     client.get("/utils/seed")
 
 
-def test_get_token(init_db):
+def test_init(init_db):
     res = client.get("/user/Alice")
     assert verify_password("alice", res.json().get("password")) is True
     assert res.status_code == 200
@@ -80,15 +75,16 @@ def test_add_debate():
         json={"topic_id": topicID, "as_pro": True, "start_time": "2022-03-16T12:20:00"},
         headers={"Authorization": "Bearer " + token1},
     )
+    assert res.status_code == 201
     debateID = res.json().get("id")
     assert debateID is not None
-    assert res.json().get("nth_time_of_debate") is 1
-    assert res.json().get("topic_id") is topicID
+    assert res.json().get("nth_time_of_debate") == 1
+    assert res.json().get("topic_id") == topicID
     assert res.json().get("pro_user_id") == aliceID
     assert res.json().get("con_user_id") is None
     assert res.json().get("first_recording_id") is None
     assert res.json().get("last_recording_id") is None
-    assert res.json().get("status") is 1
+    assert res.json().get("status") == 1
 
     res11 = client.post(
         "/debate",

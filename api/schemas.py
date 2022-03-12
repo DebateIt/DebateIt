@@ -290,7 +290,6 @@ class Recording(BaseModel):
     debate_id:int
     audio_content: bytes
     user_id:int
-    prev_recording_id:Optional[int] = None
 
     @root_validator
     def check_user_debate(cls, values):
@@ -308,20 +307,10 @@ class Recording(BaseModel):
         theDebate = crud.getOneDebate(debateID,db)
         if userID != theDebate.con_user_id and userID != theDebate.pro_user_id:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate and User not Match"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="User Not In This Debate"
             )
         db.close()
         return values
-    
-    @validator("prev_recording_id")
-    def check_prev_ID_existance(cls, v):
-        db = SessionLocal()
-        if not crud.IsRecIdExist(v, db):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Recording Not Exist"
-            )
-        db.close()
-        return v
 
 
 class LinkRecording(BaseModel):
@@ -361,6 +350,79 @@ class LinkRecording(BaseModel):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Prev Position Unavailable, use Update instead"
                 )
+            
+            thePrevRec = crud.getOneRec(prevID,db)
+            if theRec.debate_id != thePrevRec.debate_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Prev and Current Recordings Have Different Debate ID"
+                )
+            if thePrevRec.next_recording_id is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Prev Recording's Next Position Unavailable"
+                )
+        if nextID is not None:
+            if not crud.IsRecIdExist(nextID, db):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Next Recording ID Not Exist"
+                )
+            if theRec.next_recording_id is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Next Position Unavailable, use Update instead"
+                )
+            
+            theNextRec = crud.getOneRec(nextID,db)
+            if theRec.debate_id != theNextRec.debate_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Next and Current Recordings Have Different Debate ID"
+                )
+            # 这里不对，需要再建一个class来处理coLink的问题
+            if theNextRec.prev_recording_id is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Next Recording's Prev Unavailable'"
+                )
+        db.close()
+        return values
+
+    
+class CoLinkRecording(BaseModel):
+    id:int
+    prev_recording_id: Optional[int] = None
+    next_recording_id: Optional[int] = None
+
+    @validator("id")
+    def check_rec_existance(cls, v):
+        db = SessionLocal()
+        if not crud.IsRecIdExist(v, db):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Recording Not Exist"
+            )
+        db.close()
+        return v
+    
+    @root_validator
+    def check_user_debate(cls, values):
+        recID = values.get("id")
+        prevID = values.get("prev_recording_id")
+        nextID = values.get("next_recording_id")
+        db = SessionLocal()
+
+        if prevID is None and nextID is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Prev and Next Cannot be both None",
+            )
+        theRec = crud.getOneRec(recID,db)
+
+        if prevID is not None:
+            if not crud.IsRecIdExist(prevID, db):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Prev Recording ID Not Exist"
+                )
+            if theRec.prev_recording_id is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Prev Position Unavailable, use Update instead"
+                )
+
         if nextID is not None:
             if not crud.IsRecIdExist(nextID, db):
                 raise HTTPException(
