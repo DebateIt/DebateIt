@@ -28,9 +28,9 @@ def init_db():
     res = client.post("/login", json={"username": "TestUser", "password": "666"})
     global token
     token = res.json().get("token_content")
-    assert res.status_code == 200
 
 
+# def test_create_topic(init_db):
 def test_create_topic(init_db):
     # Create a topic
     res = client.post(
@@ -43,7 +43,6 @@ def test_create_topic(init_db):
 
     global topic_id
     topic_id = int(res.json().get("id"))
-    assert topic_id > 0
 
     # pass an existed name (use a topic created in the crud seed api)
     res = client.post(
@@ -53,6 +52,7 @@ def test_create_topic(init_db):
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 400  # check status code
+    assert res.json().get("detail") == "Topic Name Already Exist"
 
     # pass a JSON body without name
     res = client.post(
@@ -62,6 +62,8 @@ def test_create_topic(init_db):
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 422  # check status code
+    assert res.json().get("detail")[0]["loc"] == ["body", "name"]
+    assert res.json().get("detail")[0]["msg"] == "field required"
 
     # pass a JSON body without creator_id
     res = client.post(
@@ -89,6 +91,8 @@ def test_create_topic(init_db):
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 422  # check status code
+    assert res.json().get("detail")[0]["loc"] == ["body", "num_of_debates"]
+    assert res.json().get("detail")[0]["msg"] == "ensure this value is greater than or equal to 0"
 
 
 def test_read_topic():
@@ -105,6 +109,7 @@ def test_read_topic():
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 404  # check status code
+    assert res.json().get("detail") == "Topic Not Found"
 
     # Pass a URL param without topic id
     res = client.get(
@@ -168,6 +173,7 @@ def test_update_topic():
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 404  # check status code
+    assert res.json().get("detail") == "Topic Not Found"
 
     # Pass a URL param without topic id
     res = client.put(
@@ -195,6 +201,7 @@ def test_update_topic():
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 400  # check status code
+    assert res.json().get("detail") == "Topic Name Already Exist"
 
 
 def test_delete_topic():
@@ -206,11 +213,12 @@ def test_delete_topic():
     assert res.status_code == 200  # check status code
 
     # Delete a topic that is not existed
-    res = client.get(
+    res = client.delete(
         "/topic/" + str(topic_id),
         headers={"Authorization": "Bearer " + token},
     )
     assert res.status_code == 404  # check status code
+    assert res.json().get("detail") == "Topic Not Found"
 
     # Reseed all tables
     client.get("/utils/seed")
