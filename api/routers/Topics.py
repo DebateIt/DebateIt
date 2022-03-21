@@ -70,8 +70,11 @@ def update_topic(
 
 # Delete a topic
 @router.delete("/{topic_id}")
-def delete_topic(topic_id: int, db: Session = Depends(get_db),
-                 currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> Response:
+def delete_topic(
+    topic_id: int,
+    db: Session = Depends(get_db),
+    currUser: schemas.TokenData = Depends(auth.getCurrentUser),
+) -> Response:
     if topic_id is None or not crud.is_topic_existed(topic_id, db):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"

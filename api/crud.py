@@ -93,8 +93,9 @@ def is_topic_name_existed(topic_name, db: Session) -> bool:
     return db.query(res.exists()).scalar()
 
 
-def create_one_topic(name: str, description: str, creator_id: int,
-                     num_of_debates: int, db: Session) -> Topic:
+def create_one_topic(
+    name: str, description: str, creator_id: int, num_of_debates: int, db: Session
+) -> Topic:
     new_topic = Topic(
         name=name,
         description=description,
