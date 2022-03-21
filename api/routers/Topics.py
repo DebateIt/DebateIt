@@ -48,7 +48,7 @@ def update_topic(
 ) -> Topic:
     if topic_id is None or not crud.is_topic_existed(topic_id, db):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"
         )
 
     # if the topic still uses the old name, skip checking
@@ -70,11 +70,13 @@ def update_topic(
 
 # Delete a topic
 @router.delete("/{topic_id}")
-def delete_topic(
-    topic_id: int,
-    db: Session = Depends(get_db),
-    currUser: schemas.TokenData = Depends(auth.getCurrentUser),
-) -> Response:
+def delete_topic(topic_id: int, db: Session = Depends(get_db),
+                 currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> Response:
+    if topic_id is None or not crud.is_topic_existed(topic_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"
+        )
+
     # check whether the user of "currUser.id" owns the topic of "topic_id"
     own_topic(topic_id, currUser.id, db)
 
