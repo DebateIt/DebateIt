@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function PasswordBox({
+function Textarea({
   name, onChange, helpInfo, value,
 }) {
   return (
@@ -16,14 +16,15 @@ function PasswordBox({
       <div className="field-body">
         <div className="field">
           <p className="control is-expanded">
-            <input
-              className="input is-family-secondary"
-              type="password"
+            <textarea
+              className="textarea is-family-secondary"
               placeholder={name}
               id={name}
               onChange={onChange}
               value={value}
-            />
+            >
+
+            </textarea>
           </p>
           <p className="help is-white">{ helpInfo }</p>
         </div>
@@ -32,11 +33,12 @@ function PasswordBox({
   );
 }
 
-PasswordBox.propTypes = {
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  helpInfo: PropTypes.string,
-  value: PropTypes.string,
+Textarea.propTypes = {
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    helpInfo: PropTypes.string,
+    value: PropTypes.string,
 };
 
-export default PasswordBox;
+export default Textarea;
+  

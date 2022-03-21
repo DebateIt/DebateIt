@@ -12,13 +12,17 @@ def own_topic(topic_id: int, creator_id: int, db: Session):
     if creator_id != db.query(Topic).filter(Topic.id == topic_id).first().creator_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Topic Not Created by the Current User"
+            detail="Topic Not Created by the Current User",
         )
+
 
 # Create one topic
 @router.post("", status_code=status.HTTP_201_CREATED)
-def create_topic(topic: CreateTopic, db: Session = Depends(get_db),
-                 currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> Topic:
+def create_topic(
+    topic: CreateTopic,
+    db: Session = Depends(get_db),
+    currUser: schemas.TokenData = Depends(auth.getCurrentUser),
+) -> Topic:
     return create_one_topic(
         topic.name, topic.description, currUser.id, topic.num_of_debates, db
     )
@@ -35,9 +39,13 @@ def get_topic(topic_id: int, db: Session = Depends(get_db)) -> Topic:
 
 
 # Update one topic profile
-@router.put("/{topic_id}") # topic_id
-def update_topic(topic_id: int, topic: UpdateTopic, db: Session = Depends(get_db),
-                 currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> Topic:
+@router.put("/{topic_id}")  # topic_id
+def update_topic(
+    topic_id: int,
+    topic: UpdateTopic,
+    db: Session = Depends(get_db),
+    currUser: schemas.TokenData = Depends(auth.getCurrentUser),
+) -> Topic:
     if topic_id is None or not crud.is_topic_existed(topic_id, db):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"
@@ -50,7 +58,7 @@ def update_topic(topic_id: int, topic: UpdateTopic, db: Session = Depends(get_db
             if is_topic_name_existed(topic.name, db):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Topic Name Already Exist"
+                    detail="Topic Name Already Exist",
                 )
 
     # check whether the user of "currUser.id" owns the topic of "topic_id"

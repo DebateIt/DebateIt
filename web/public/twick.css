@@ -1,3 +1,9 @@
 html, body, .App, #root{
     height: 100%
 }
+
+.TopicCreateButton {
+    position: fixed;
+    bottom: 2em;
+    right: 2em;
+}

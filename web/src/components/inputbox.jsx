@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function InputBox({ name }) {
+function InputBox({
+  name, onChange, helpInfo, value,
+}) {
   return (
     <div className="field is-horizontal">
       <div className="field-label is-normal">
@@ -19,8 +21,11 @@ function InputBox({ name }) {
               type="text"
               placeholder={name}
               id={name}
+              onChange={onChange}
+              value={value}
             />
           </p>
+          <p className="help is-white">{ helpInfo }</p>
         </div>
       </div>
     </div>
@@ -29,6 +34,9 @@ function InputBox({ name }) {
 
 InputBox.propTypes = {
   name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  helpInfo: PropTypes.string,
+  value: PropTypes.string,
 };
 
 export default InputBox;
