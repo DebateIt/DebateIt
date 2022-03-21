@@ -18,11 +18,8 @@ def init_db():
 
     # Create an user for later topic testing
     res = client.post("/user", json={"username": "TestUser", "password": "666"})
-    assert verify_password("666", res.json().get("password")) is True
-    assert res.status_code == 201
     global creator_id
     creator_id = int(res.json().get("id"))
-    assert creator_id >= 0
 
     # Retrieve token for later CRUD operations
     res = client.post("/login", json={"username": "TestUser", "password": "666"})
