@@ -17,8 +17,25 @@ function DebateText() {
                     </div>
                 </div>
             </div>
-            <div className="is-flex-grow-1">
-
+            <div className="is-flex-grow-1 is-family-secondary">
+                <div className="columns">
+                    <div className="column is-half">
+                        <div className="box has-background-primary">
+                            <p className="has-text-white">
+                                Traditionally speaking, science expo is a thing dads will do
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div className="columns">
+                    <div className="column is-half is-offset-half">
+                        <div className="box has-background-success">
+                            <p className="has-text-primary">
+                                Scientifically speaking, tradition is a thing idiots will do
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className="columns is-variable is-1">
                 <div className="column is-11">
