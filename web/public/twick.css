@@ -6,6 +6,10 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+.scrollable::-webkit-scrollbar {
+    display: none;
+}
+
 .TopicCreateButton {
     position: fixed;
     bottom: 2em;
