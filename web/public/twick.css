@@ -1,5 +1,13 @@
 html, body, .App, #root{
-    height: 100%
+    height: 100%;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollable::-webkit-scrollbar {
+    display: none;
 }
 
 .TopicCreateButton {

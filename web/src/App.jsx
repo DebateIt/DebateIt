@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import User from './pages/User';
 import Intro from './pages/Intro';
 import TopicCreate from './pages/TopicCreate';
+import DebateText from './pages/DebateText';
 
 function App() {
   const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
@@ -25,7 +26,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={(<Intro />)}
+            element={(<DebateText />)}
           />
           <Route
             path="topic"
