@@ -1,9 +1,12 @@
+from random import randint
 from fastapi.testclient import TestClient
+import starlette
 from ..main import app
 from ..database import SessionLocal
 import pytest
 from ..auth import verify_password
 from .. import crud
+from datetime import datetime, timedelta
 
 client = TestClient(app)
 global token1
@@ -14,6 +17,10 @@ global aliceID
 global bobID
 global topicID
 global topicID2
+
+global startTime 
+now = datetime.now() + timedelta(days=randint(1,5),minutes=randint(1,38),hours=randint(1,53),seconds=randint(2,45))
+startTime= datetime.strftime(now, "%Y-%m-%dT%H:%M:%S")
 
 
 @pytest.fixture()
@@ -72,7 +79,7 @@ def test_add_debate():
 
     res = client.post(
         "/debate",
-        json={"topic_id": topicID, "as_pro": True, "start_time": "2022-03-16T12:20:00"},
+        json={"topic_id": topicID, "as_pro": True, "start_time": startTime},
         headers={"Authorization": "Bearer " + token1},
     )
     assert res.status_code == 201
@@ -91,7 +98,7 @@ def test_add_debate():
         json={
             "topic_id": topicID2,
             "as_pro": True,
-            "start_time": "2022-03-17T12:20:00",
+            "start_time": startTime,
         },
         headers={"Authorization": "Bearer " + token1},
     )
@@ -99,7 +106,7 @@ def test_add_debate():
 
     res2 = client.post(
         "/debate",
-        json={"topic_id": 0, "as_pro": True, "start_time": "2022-03-16T12:20:00"},
+        json={"topic_id": 0, "as_pro": True, "start_time": startTime},
         headers={"Authorization": "Bearer " + token1},
     )
     assert res2.status_code == 400
@@ -107,7 +114,7 @@ def test_add_debate():
 
     res3 = client.post(
         "/debate",
-        json={"topic_id": topicID, "start_time": "2022-03-16T12:20:00"},
+        json={"topic_id": topicID, "start_time": startTime},
         headers={"Authorization": "Bearer " + token1},
     )
     assert res3.status_code == 400
@@ -119,7 +126,7 @@ def test_add_debate():
             "topic_id": topicID,
             "as_pro": True,
             "as_con": True,
-            "start_time": "2022-03-16T12:20:00",
+            "start_time": startTime,
         },
         headers={"Authorization": "Bearer " + token1},
     )
@@ -131,7 +138,7 @@ def test_add_debate():
         json={
             "topic_id": topicID,
             "as_pros": True,
-            "start_time": "2022-03-16T12:20:00",
+            "start_time": startTime,
         },
         headers={"Authorization": "Bearer " + token1},
     )
@@ -140,7 +147,7 @@ def test_add_debate():
 
     res4 = client.post(
         "/debate",
-        json={"topic_id": topicID, "as_pro": True, "start_time": "2021-03-16T12:20:00"},
+        json={"topic_id": topicID, "as_pro": True, "start_time":"2022-02-02T12:03:00"},
         headers={"Authorization": "Bearer " + token1},
     )
     assert res4.status_code == 400
@@ -148,7 +155,7 @@ def test_add_debate():
 
     res5 = client.post(
         "/debate",
-        json={"topic_id": topicID, "as_pro": True, "start_time": "2021-03-16T12:20:00"},
+        json={"topic_id": topicID, "as_pro": True, "start_time": startTime},
         headers={"Authorization": "Bearer "},
     )
     assert res5.status_code == 401
