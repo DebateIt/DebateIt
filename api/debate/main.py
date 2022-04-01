@@ -12,11 +12,13 @@ app.add_middleware(
 
 PRO_USER_ID = None
 CON_USER_ID = None
-curr_turn   = None
+curr_turn = None
+
 
 @app.get("/history")
 def get_debate_history():
     return None
+
 
 @app.post("/message")
 def send_message():
