@@ -1,6 +1,5 @@
 from random import randint
 from fastapi.testclient import TestClient
-import starlette
 from ..main import app
 from ..database import SessionLocal
 import pytest
