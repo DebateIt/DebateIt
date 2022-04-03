@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from ..dependencies import get_db
-from ..import models
+from .. import models
 
 app = FastAPI()
 app.add_middleware(
@@ -32,9 +32,7 @@ class Message(BaseModel):
 
 @app.get("/history")
 def get_debate_history(db: Session = Depends(get_db)):
-    return db.query(models.Message).filter(
-        models.Message.debate_id == DEBATE_ID
-    ).all()
+    return db.query(models.Message).filter(models.Message.debate_id == DEBATE_ID).all()
 
 
 @app.post("/message")
@@ -43,9 +41,7 @@ def send_message(
     db: Session = Depends(get_db),
 ):
     new_message = models.Message(
-        content=payload.content,
-        debate_id=DEBATE_ID,
-        user_id=payload.user_id
+        content=payload.content, debate_id=DEBATE_ID, user_id=payload.user_id
     )
     db.add(new_message)
     db.commit()
