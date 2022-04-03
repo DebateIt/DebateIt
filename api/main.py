@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import Utils, Topics, Users, Auth, Debates, Recordings
+from .routers import Utils, Topics, Users, Auth, Debates
 from . import models
 from .database import SessionLocal, engine
 
@@ -21,4 +21,3 @@ app.include_router(Topics.router)
 app.include_router(Users.router)
 app.include_router(Auth.router)
 app.include_router(Debates.router)
-app.include_router(Recordings.router)
