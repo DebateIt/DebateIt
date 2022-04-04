@@ -63,9 +63,5 @@ class Message(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(String)
 
-    debate_id = Column(
-        Integer,
-        ForeignKey("debates.id"),
-        nullable=False
-    )
+    debate_id = Column(Integer, ForeignKey("debates.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)

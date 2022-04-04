@@ -26,9 +26,12 @@ curr_turn = PRO_USER_ID
 
 @app.get("/history")
 def get_debate_history(db: Session = Depends(get_db)):
-    return db.query(Message).filter(
-        Message.debate_id == DEBATE_ID
-    ).order_by(Message.id).all()
+    return (
+        db.query(Message)
+        .filter(Message.debate_id == DEBATE_ID)
+        .order_by(Message.id)
+        .all()
+    )
 
 
 @app.post("/message")
@@ -38,15 +41,13 @@ def send_message(
 ):
     global curr_turn
 
-    if (curr_turn != payload.user_id):
+    if curr_turn != payload.user_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"User #{payload.user_id} cannot send message in this turn!"
+            detail=f"User #{payload.user_id} cannot send message in this turn!",
         )
     new_message = Message(
-        content=payload.content,
-        debate_id=DEBATE_ID,
-        user_id=payload.user_id
+        content=payload.content, debate_id=DEBATE_ID, user_id=payload.user_id
     )
     db.add(new_message)
     db.commit()
