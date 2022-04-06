@@ -10,7 +10,7 @@ from . import schemas, auth
 
 def seed(db: Session) -> None:
     # Empty the database
-    tables = [Recording, Debate, Topic, User]
+    tables = [Message, Debate, Topic, User]
     for t in tables:
         db.execute(delete(t))
     db.commit()
@@ -309,105 +309,105 @@ def userExitDebate(userID, payload: schemas.ExitDebate, db: Session):
         )
 
 
-def IsRecIdExist(id, db) -> bool:
-    res = db.query(Recording).filter(Recording.id == id)
-    return db.query(res.exists()).scalar()
+# def IsRecIdExist(id, db) -> bool:
+#     res = db.query(Recording).filter(Recording.id == id)
+#     return db.query(res.exists()).scalar()
 
 
-def getOneRec(id: int, db: Session) -> Recording:
-    return db.query(Recording).filter(Recording.id == id).first()
+# def getOneRec(id: int, db: Session) -> Recording:
+#     return db.query(Recording).filter(Recording.id == id).first()
 
 
-def addOneRec(userID: int, payload: schemas.Recording, db: Session) -> Recording:
-    data = payload.dict(exclude_unset=True)
-    new_Rec = Recording(**data)
-    db.add(new_Rec)
-    db.commit()
-    db.refresh(new_Rec)
-    return new_Rec
+# def addOneRec(userID: int, payload: schemas.Recording, db: Session) -> Recording:
+#     data = payload.dict(exclude_unset=True)
+#     new_Rec = Recording(**data)
+#     db.add(new_Rec)
+#     db.commit()
+#     db.refresh(new_Rec)
+#     return new_Rec
 
 
-def delOneRec(id, db: Session) -> bool:
-    theRec = getOneRec(id, db)
-    thePrevID = theRec.prev_recording_id
-    theNextID = theRec.next_recording_id
+# def delOneRec(id, db: Session) -> bool:
+#     theRec = getOneRec(id, db)
+#     thePrevID = theRec.prev_recording_id
+#     theNextID = theRec.next_recording_id
 
-    res = updateLink(db, prevID=thePrevID, nextID=theNextID)
-    if not res:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error During Updating Link"
-        )
+#     res = updateLink(db, prevID=thePrevID, nextID=theNextID)
+#     if not res:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST, detail="Error During Updating Link"
+#         )
 
-    db.query(Recording).filter(Recording.id == id).delete(synchronize_session="fetch")
-    db.commit()
-    return True
-
-
-def linkRecs(userID: int, payload: schemas.LinkRecording, db: Session):
-    update_data = payload.dict(exclude_unset=True)
-    if update_data != {}:
-        db.query(Recording).filter(Recording.id == payload.id).update(
-            update_data,
-            synchronize_session="fetch",
-        )
-        db.commit()
-    if payload.prev_recording_id is not None:
-        res = coLinkRecs(
-            schemas.CoLinkRecording(
-                id=payload.prev_recording_id, next_recording_id=payload.id
-            ),
-            db,
-        )
-        if not res:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Co-Link Prev Failed",
-            )
-
-    if payload.next_recording_id is not None:
-        res = coLinkRecs(
-            schemas.CoLinkRecording(
-                id=payload.next_recording_id, prev_recording_id=payload.id
-            ),
-            db,
-        )
-        if not res:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Co-Link Next Failed",
-            )
-
-    return getOneRec(payload.id, db)
+#     db.query(Recording).filter(Recording.id == id).delete(synchronize_session="fetch")
+#     db.commit()
+#     return True
 
 
-def coLinkRecs(payload: schemas.CoLinkRecording, db: Session):
-    update_data = payload.dict(exclude_unset=True)
-    if update_data != {}:
-        db.query(Recording).filter(Recording.id == payload.id).update(
-            update_data,
-            synchronize_session="fetch",
-        )
-        db.commit()
-    return True
+# def linkRecs(userID: int, payload: schemas.LinkRecording, db: Session):
+#     update_data = payload.dict(exclude_unset=True)
+#     if update_data != {}:
+#         db.query(Recording).filter(Recording.id == payload.id).update(
+#             update_data,
+#             synchronize_session="fetch",
+#         )
+#         db.commit()
+#     if payload.prev_recording_id is not None:
+#         res = coLinkRecs(
+#             schemas.CoLinkRecording(
+#                 id=payload.prev_recording_id, next_recording_id=payload.id
+#             ),
+#             db,
+#         )
+#         if not res:
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST,
+#                 detail="Co-Link Prev Failed",
+#             )
+
+#     if payload.next_recording_id is not None:
+#         res = coLinkRecs(
+#             schemas.CoLinkRecording(
+#                 id=payload.next_recording_id, prev_recording_id=payload.id
+#             ),
+#             db,
+#         )
+#         if not res:
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST,
+#                 detail="Co-Link Next Failed",
+#             )
+
+#     return getOneRec(payload.id, db)
 
 
-def updateLink(db: Session, prevID=None, nextID=None) -> bool:
-    if prevID is None and nextID is None:
-        if prevID is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Should Provide prev or next",
-            )
-    if prevID:
-        db.query(Recording).filter(Recording.id == prevID).update(
-            {"next_recording_id": None},
-            synchronize_session="fetch",
-        )
-        db.commit()
-    if nextID:
-        db.query(Recording).filter(Recording.id == nextID).update(
-            {"prev_recording_id": None},
-            synchronize_session="fetch",
-        )
-        db.commit()
-    return True
+# def coLinkRecs(payload: schemas.CoLinkRecording, db: Session):
+#     update_data = payload.dict(exclude_unset=True)
+#     if update_data != {}:
+#         db.query(Recording).filter(Recording.id == payload.id).update(
+#             update_data,
+#             synchronize_session="fetch",
+#         )
+#         db.commit()
+#     return True
+
+
+# def updateLink(db: Session, prevID=None, nextID=None) -> bool:
+#     if prevID is None and nextID is None:
+#         if prevID is None:
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST,
+#                 detail="Should Provide prev or next",
+#             )
+#     if prevID:
+#         db.query(Recording).filter(Recording.id == prevID).update(
+#             {"next_recording_id": None},
+#             synchronize_session="fetch",
+#         )
+#         db.commit()
+#     if nextID:
+#         db.query(Recording).filter(Recording.id == nextID).update(
+#             {"prev_recording_id": None},
+#             synchronize_session="fetch",
+#         )
+#         db.commit()
+#     return True

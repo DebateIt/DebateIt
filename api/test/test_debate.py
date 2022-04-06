@@ -17,9 +17,14 @@ global bobID
 global topicID
 global topicID2
 
-global startTime 
-now = datetime.now() + timedelta(days=randint(1,5),minutes=randint(1,38),hours=randint(1,53),seconds=randint(2,45))
-startTime= datetime.strftime(now, "%Y-%m-%dT%H:%M:%S")
+global startTime
+now = datetime.now() + timedelta(
+    days=randint(1, 5),
+    minutes=randint(1, 38),
+    hours=randint(1, 53),
+    seconds=randint(2, 45),
+)
+startTime = datetime.strftime(now, "%Y-%m-%dT%H:%M:%S")
 
 
 @pytest.fixture()
@@ -146,7 +151,7 @@ def test_add_debate():
 
     res4 = client.post(
         "/debate",
-        json={"topic_id": topicID, "as_pro": True, "start_time":"2022-02-02T12:03:00"},
+        json={"topic_id": topicID, "as_pro": True, "start_time": "2022-02-02T12:03:00"},
         headers={"Authorization": "Bearer " + token1},
     )
     assert res4.status_code == 400

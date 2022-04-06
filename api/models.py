@@ -55,17 +55,13 @@ class Debate(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     pro_user_id = Column(Integer, ForeignKey("users.id"))
     con_user_id = Column(Integer, ForeignKey("users.id"))
-    first_recording_id = Column(Integer, ForeignKey("recordings.id"))
-    last_recording_id = Column(Integer, ForeignKey("recordings.id"))
 
 
-class Recording(Base):
-    __tablename__ = "recordings"
+class Message(Base):
+    __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, index=True)
-    audio_content = Column(LargeBinary)
+    content = Column(String)
 
     debate_id = Column(Integer, ForeignKey("debates.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    prev_recording_id = Column(Integer, ForeignKey("recordings.id"))
-    next_recording_id = Column(Integer, ForeignKey("recordings.id"))
