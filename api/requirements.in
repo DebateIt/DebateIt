@@ -7,3 +7,4 @@ python-jose
 bcrypt
 numpy
 sklearn
+sentence_transformers
