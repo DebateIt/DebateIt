@@ -8,9 +8,11 @@ from ..auth import verify_password
 
 client = TestClient(app)
 
+
 @pytest.fixture()
 def init_db():
     client.get("/utils/seed")
+
 
 def test_init(init_db):
     res = client.get("/user/Alice")
@@ -21,15 +23,23 @@ def test_init(init_db):
     res_err = client.get("/user/Alice2")
     assert res_err.status_code == 404
 
+
 def test_get_topics():
     topics = crud.getAllTopics(SessionLocal())
     assert topics is not []
 
+
 def test_sentence_sim():
-    
-    res = client.post("/nlp/sentence_sim", json={"new_topic":"Do you like feminism form in your country?"})
+
+    res = client.post(
+        "/nlp/sentence_sim",
+        json={"new_topic": "Do you like feminism form in your country?"},
+    )
     assert res.status_code is 200
     assert res.json() is None
 
-    res1 = client.post("/nlp/sentence_sim", json={"new_topic":"Do you think feminism works for women?"})
+    res1 = client.post(
+        "/nlp/sentence_sim",
+        json={"new_topic": "Do you think feminism works for women?"},
+    )
     assert res1.json() == "Is feminism about female dominance?"

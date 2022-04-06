@@ -117,8 +117,9 @@ def get_one_topic(topic_id: int, db: Session) -> Topic:
 def getOneTopicByName(name: str, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.name == name).first()
 
-def getAllTopics(db:Session) -> list[str]:
-    return [topic[0] for topic in  db.query(Topic.name).all()]
+
+def getAllTopics(db: Session) -> list[str]:
+    return [topic[0] for topic in db.query(Topic.name).all()]
 
 
 def update_one_topic(topic_id: int, topic: schemas.UpdateTopic, db: Session) -> Topic:

@@ -448,13 +448,15 @@ class CoLinkRecording(BaseModel):
         db.close()
         return values
 
+
 class SentSim(BaseModel):
-    new_topic:str
+    new_topic: str
 
     @validator("new_topic")
     def check_rec_existance(cls, v):
         if v is None or v is []:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Sending an Empty String on Compare"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sending an Empty String on Compare",
             )
         return v
