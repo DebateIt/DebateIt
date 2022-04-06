@@ -22,6 +22,13 @@ h11==0.13.0
     # via uvicorn
 idna==3.3
     # via anyio
+joblib==1.1.0
+    # via scikit-learn
+numpy==1.22.3
+    # via
+    #   -r requirements.in
+    #   scikit-learn
+    #   scipy
 passlib==1.7.4
     # via -r requirements.in
 psycopg2==2.9.3
@@ -38,16 +45,24 @@ python-jose==3.3.0
     # via -r requirements.in
 rsa==4.8
     # via python-jose
+scikit-learn==1.0.2
+    # via sklearn
+scipy==1.8.0
+    # via scikit-learn
 six==1.16.0
     # via
     #   bcrypt
     #   ecdsa
+sklearn==0.0
+    # via -r requirements.in
 sniffio==1.2.0
     # via anyio
 sqlalchemy==1.4.31
     # via -r requirements.in
 starlette==0.17.1
     # via fastapi
+threadpoolctl==3.1.0
+    # via scikit-learn
 typing-extensions==4.0.1
     # via pydantic
 uvicorn==0.17.1
