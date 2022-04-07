@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ChatInputBox from '../components/chatinputbox';
+import Message from '../components/message';
 
 function DebateText() {
   return (
@@ -23,96 +24,14 @@ function DebateText() {
           overflow: 'scroll',
         }}
       >
-        <div className="columns">
-          <div className="column is-half">
-            <div className="box has-background-primary">
-              <p className="has-text-white">
-                Traditionally speaking, science expo is a thing dads will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half is-offset-half">
-            <div className="box has-background-success">
-              <p className="has-text-primary">
-                Scientifically speaking, tradition is a thing idiots will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half">
-            <div className="box has-background-primary">
-              <p className="has-text-white">
-                Traditionally speaking, science expo is a thing dads will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half is-offset-half">
-            <div className="box has-background-success">
-              <p className="has-text-primary">
-                Scientifically speaking, tradition is a thing idiots will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half">
-            <div className="box has-background-primary">
-              <p className="has-text-white">
-                Traditionally speaking, science expo is a thing dads will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half is-offset-half">
-            <div className="box has-background-success">
-              <p className="has-text-primary">
-                Scientifically speaking, tradition is a thing idiots will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half">
-            <div className="box has-background-primary">
-              <p className="has-text-white">
-                Traditionally speaking, science expo is a thing dads will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half is-offset-half">
-            <div className="box has-background-success">
-              <p className="has-text-primary">
-                Scientifically speaking, tradition is a thing idiots will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half">
-            <div className="box has-background-primary">
-              <p className="has-text-white">
-                Traditionally speaking, science expo is a thing dads will do
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="columns">
-          <div className="column is-half is-offset-half">
-            <div className="box has-background-success">
-              <p className="has-text-primary">
-                Scientifically speaking, tradition is a thing idiots will do
-              </p>
-            </div>
-          </div>
-        </div>
+        <Message 
+          content="Traditionally speaking, science expo is a thing dads will do"
+          isYourTurn={true}
+        />
+        <Message
+          content="Scientifically speaking, tradition is a thing idiots will do"
+          isYourTurn={false}
+        />
       </div>
       <div className="columns is-variable is-1 has-background-info">
         <div className="column is-11">
