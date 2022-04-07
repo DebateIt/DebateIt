@@ -96,6 +96,7 @@ def test_add_debate():
     assert res.json().get("first_recording_id") is None
     assert res.json().get("last_recording_id") is None
     assert res.json().get("status") == 1
+    assert res.json().get("switched") is False
 
     res11 = client.post(
         "/debate",
@@ -263,8 +264,20 @@ def test_message():
     res6 = client.post("/room/message",
         json={"content":"I don't like this","debate_id":debateID,"pro_turn":False},
         headers={"Authorization": "Bearer "+token2})
-    print(res6.json())
+    assert res6.status_code == 200
+    assert res6.json().get('pro_turn') is True
 
+def test_switch():
+    global debateID
+    res = client.get(f"/room/switch/{debateID}", headers={"Authorization": "Bearer " + token1})
+    assert res.status_code == 200
+    assert res.json().get("pro_turn") is False
+
+    res2 = client.post("/room/message",
+        json={"content":"This is False Continuous","debate_id":debateID,"pro_turn":False},
+        headers={"Authorization": "Bearer " + token2})
+    assert res2.status_code == 200
+    assert res2.json().get("pro_turn") is True
 
 def test_leave_debate():
     global token1

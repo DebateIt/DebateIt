@@ -1,3 +1,4 @@
+from email.policy import default
 from sqlalchemy import (
     Column,
     Integer,
@@ -6,7 +7,7 @@ from sqlalchemy import (
     Text,
     Enum,
     DateTime,
-    LargeBinary,
+    BOOLEAN
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -55,6 +56,7 @@ class Debate(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     pro_user_id = Column(Integer, ForeignKey("users.id"))
     con_user_id = Column(Integer, ForeignKey("users.id"))
+    switched = Column(BOOLEAN,default = False)
 
 
 class Message(Base):

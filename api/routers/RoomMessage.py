@@ -1,17 +1,17 @@
-from fastapi import FastAPI, Depends, HTTPException, status,APIRouter
+from fastapi import FastAPI, Depends, HTTPException, status,APIRouter, Response
 from fastapi.responses import JSONResponse
-from pydantic import JsonError
 from sqlalchemy.orm import Session
 
 from ..dependencies import get_db
-from ..models import Message
+from ..models import Message, Debate
 from .. import schemas, auth, crud
 
 router = APIRouter(prefix="/room")
 
 def determine_turn(debate_id:int, db: Session) -> bool:
+    switch = crud.getOneSwitch(debate_id,db)
     number = db.query(Message).filter(Message.debate_id == debate_id).count()
-    return bool((number+1) % 2)
+    return bool((number+1 + int(switch)) % 2)
 
 
 @router.get("/history/{debateID}")
@@ -34,11 +34,22 @@ def initialize_room(debateID:int,db: Session = Depends(get_db)):
 # 以后需要在数据表里加入message对另外的message的引用
 
 @router.get("/switch/{debate_id}")
-def switch_turn_algo(debate_id:int):
-    pass
-    # 这里需要更改model了，我现在想的是在Debate Schema改一下
-    # 增加一个列，关于是不是已经switch了
-    # Switch只需要在determine turn那里增加一个residual即可
+def switch_turn_algo(debate_id:int,
+    db: Session = Depends(get_db),
+    currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> JSONResponse:
+    curr_turn = determine_turn(debate_id,db)
+    curr_deb = crud.getOneDebate(debate_id,db)
+    if (curr_turn and curr_deb.pro_user_id != currUser.id) or \
+        (not curr_turn and curr_deb.con_user_id != currUser.id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User #{currUser.id} cannot send message in this turn!",
+        )
+
+    crud.updateSwitch(debate_id,db,not curr_deb.switched)
+
+    return JSONResponse(content={"pro_turn":determine_turn(debate_id,db),"debate_id":debate_id})
+
 
 @router.post("/message")
 def send_message(
