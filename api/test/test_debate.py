@@ -229,6 +229,42 @@ def test_join_debate():
     assert res7.status_code == 400
     assert res7.json().get("detail") == "Wrong Debate Status, Cannot Join Now"
 
+def test_message():
+    global debateID
+    global aliceID
+    res = client.get(f"/room/initialize/{debateID}")
+    assert res.json().get("pro_turn") is True
+    assert res.json().get("debate_id") == debateID
+
+    res2 = client.post("/room/message",
+        json={"content":"I hope this to be true","debate_id":debateID,"pro_turn":True},
+        headers={"Authorization": "Bearer " + token1})
+
+    assert res2.json().get("pro_turn") is False
+
+    res3 = client.post("/room/message",
+        json={"content":"I hope this to be true again","debate_id":debateID,"pro_turn":True},
+        headers={"Authorization": "Bearer " + token1})
+    assert res3.status_code == 400
+    assert res3.json().get("detail") == 'Turn Match Error'
+
+    res4 = client.post("/room/message",
+        json={"content":"I hope this to be true again","debate_id":debateID,"pro_turn":False},
+        headers={"Authorization": "Bearer " + token1})
+    assert res4.status_code == 400
+    assert res4.json().get("detail") == f'User #{aliceID} cannot send message in this turn!'
+
+    res5 = client.post("/room/message",
+        json={"content":"I hope this to be true again","debate_id":debateID,"pro_turn":False},
+        headers={"Authorization": "Bearer "})
+    assert res5.status_code == 401
+    assert res5.json().get("detail") ==  'Invalid Credentials'
+
+    res6 = client.post("/room/message",
+        json={"content":"I don't like this","debate_id":debateID,"pro_turn":False},
+        headers={"Authorization": "Bearer "+token2})
+    print(res6.json())
+
 
 def test_leave_debate():
     global token1

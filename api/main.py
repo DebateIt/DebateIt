@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import Nlp, Utils, Topics, Users, Auth, Debates
+from .routers import Nlp, Utils, Topics, Users, Auth, Debates, RoomMessage
 from . import models
 from .database import SessionLocal, engine
 
@@ -22,3 +22,4 @@ app.include_router(Users.router)
 app.include_router(Auth.router)
 app.include_router(Debates.router)
 app.include_router(Nlp.router)
+app.include_router(RoomMessage.router)

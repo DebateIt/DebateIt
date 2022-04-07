@@ -460,3 +460,9 @@ class SentSim(BaseModel):
                 detail="Sending an Empty String on Compare",
             )
         return v
+
+class Message(BaseModel):
+    id: Optional[int] = None
+    content: str
+    debate_id: int
+    pro_turn: bool
