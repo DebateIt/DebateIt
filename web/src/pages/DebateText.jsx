@@ -6,23 +6,45 @@ import Message from '../components/message';
 
 function DebateText() {
   const myUserId = 28;
+  const [messageContent, setMessageContent] = useState("");
   const [history, setHistory] = useState([]);
 
-  useEffect(() => {
-    axios.get(
-      'http://localhost:8000/history'
-    ).then((res) => {
-      setHistory(res.data);
-    }).catch((err) => {
-      console.log(err);
-    })
-  }, []);
-
+  
   const messages = history.map(mes => {
     return (
       <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
-    );
-  });
+      );
+    });
+
+    const readHistory = () => {
+      axios.get(
+        'http://localhost:8000/history'
+      ).then((res) => {
+        setHistory(res.data);
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+    
+    const send = () => {
+      axios.post('http://localhost:8000/message', {
+        "content": messageContent,
+        "user_id": myUserId,
+      }).then((res) => {
+        setMessageContent("");
+        readHistory();
+      }).catch((err) => {
+        console.log(err);
+      })
+    }
+    
+    const fieldOnChange = (setState) => (event) => {
+      setState(event.target.value);
+    };
+    
+    useEffect(() => {
+      readHistory();
+    }, []);
 
   return (
     <div className="column is-flex is-flex-direction-column">
@@ -50,6 +72,8 @@ function DebateText() {
         <div className="column is-11">
           <ChatInputBox
             name="Send Your Argument and Rebuttal"
+            onChange={fieldOnChange(setMessageContent)}
+            value={messageContent}
           />
         </div>
         <div className="column">
@@ -57,6 +81,7 @@ function DebateText() {
             <button
               type="button"
               className="button is-success has-text-info is-fullwidth"
+              onClick={send}
             >
               Send
             </button>
