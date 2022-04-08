@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import ChatInputBox from '../components/chatinputbox';
 import Message from '../components/message';
 
 function DebateText() {
+  const myUserId = 28;
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    axios.get(
+      'http://localhost:8000/history'
+    ).then((res) => {
+      setHistory(res.data);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }, []);
+
+  const messages = history.map(mes => {
+    return (
+      <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
+    );
+  });
+
   return (
     <div className="column is-flex is-flex-direction-column">
       <div className="level">
@@ -24,14 +44,7 @@ function DebateText() {
           overflow: 'scroll',
         }}
       >
-        <Message 
-          content="Traditionally speaking, science expo is a thing dads will do"
-          isYourTurn={true}
-        />
-        <Message
-          content="Scientifically speaking, tradition is a thing idiots will do"
-          isYourTurn={false}
-        />
+        {messages}
       </div>
       <div className="columns is-variable is-1 has-background-info">
         <div className="column is-11">
