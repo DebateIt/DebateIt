@@ -13,38 +13,43 @@ function DebateText() {
   const messages = history.map(mes => {
     return (
       <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
-      );
-    });
+    );
+  });
 
-    const readHistory = () => {
-      axios.get(
-        'http://localhost:8000/history'
-      ).then((res) => {
-        setHistory(res.data);
-      }).catch((err) => {
-        console.log(err);
-      });
-    }
-    
-    const send = () => {
-      axios.post('http://localhost:8000/message', {
-        "content": messageContent,
-        "user_id": myUserId,
-      }).then((res) => {
-        setMessageContent("");
-        readHistory();
-      }).catch((err) => {
-        console.log(err);
-      })
-    }
-    
-    const fieldOnChange = (setState) => (event) => {
-      setState(event.target.value);
-    };
-    
-    useEffect(() => {
+  const readHistory = () => {
+    axios.get(
+      'http://localhost:8000/history'
+    ).then((res) => {
+      setHistory(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+  
+  const send = () => {
+    axios.post('http://localhost:8000/message', {
+      "content": messageContent,
+      "user_id": myUserId,
+    }).then((res) => {
+      setMessageContent("");
       readHistory();
-    }, []);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+  
+  const fieldOnChange = (setState) => (event) => {
+    setState(event.target.value);
+  };
+
+  // This is a really bad practice here but I'll do it for simplicity's sake
+  // In the future we need to set an endpoint in the backend just to check
+  // if the other user has already sent a message or not. Or we can setup
+  // a websocket server to let the backend update the history data on the
+  // frontend
+  useEffect(() => {
+    setTimeout(readHistory, 1000);
+  });
 
   return (
     <div className="column is-flex is-flex-direction-column">
