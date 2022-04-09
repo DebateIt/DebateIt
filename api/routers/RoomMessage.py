@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException, status,APIRouter, Response
+from fastapi import  Depends, HTTPException, status,APIRouter
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from ..dependencies import get_db
-from ..models import Message, Debate
+from ..models import Message
 from .. import schemas, auth, crud
 
 router = APIRouter(prefix="/room")
@@ -25,7 +25,7 @@ def get_debate_history(debateID:int,db: Session = Depends(get_db)):
 
 @router.get("/initialize/{debateID}")
 def initialize_room(debateID:int,db: Session = Depends(get_db)):
-    return JSONResponse(content={"pro_turn":determine_turn(debateID,db),"debate_id":debateID})
+    return {"pro_turn":determine_turn(debateID,db),"debate_id":debateID}
 
 # TODO 
 # 需要写一个Next多少多少条的
@@ -36,7 +36,7 @@ def initialize_room(debateID:int,db: Session = Depends(get_db)):
 @router.get("/switch/{debate_id}")
 def switch_turn_algo(debate_id:int,
     db: Session = Depends(get_db),
-    currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> JSONResponse:
+    currUser: schemas.TokenData = Depends(auth.getCurrentUser)) -> dict:
     curr_turn = determine_turn(debate_id,db)
     curr_deb = crud.getOneDebate(debate_id,db)
     if (curr_turn and curr_deb.pro_user_id != currUser.id) or \
@@ -48,7 +48,7 @@ def switch_turn_algo(debate_id:int,
 
     crud.updateSwitch(debate_id,db,not curr_deb.switched)
 
-    return JSONResponse(content={"pro_turn":determine_turn(debate_id,db),"debate_id":debate_id})
+    return {"pro_turn":determine_turn(debate_id,db),"debate_id":debate_id}
 
 
 @router.post("/message")
@@ -56,10 +56,7 @@ def send_message(
     payload: schemas.Message,
     db: Session = Depends(get_db),
     currUser: schemas.TokenData = Depends(auth.getCurrentUser),
-) -> JSONResponse:
-    # 先写一个运算复杂的方法
-    # 收到token，decode，验证这个User是不是正确的
-    # 但是之后我认为可以用类似Merkel Tree的东西来确认是哪一个debate
+) -> dict:
     curr_turn = determine_turn(payload.debate_id,db)
     if payload.pro_turn is not curr_turn:
         raise HTTPException(
@@ -82,4 +79,4 @@ def send_message(
     db.commit()
     db.refresh(new_message)
 
-    return JSONResponse(content={"pro_turn":determine_turn(payload.debate_id,db),"debate_id":payload.debate_id})
+    return {"pro_turn":determine_turn(payload.debate_id,db),"debate_id":payload.debate_id}
