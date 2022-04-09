@@ -7,7 +7,7 @@ from sqlalchemy import (
     Text,
     Enum,
     DateTime,
-    BOOLEAN
+    BOOLEAN,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -56,7 +56,7 @@ class Debate(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     pro_user_id = Column(Integer, ForeignKey("users.id"))
     con_user_id = Column(Integer, ForeignKey("users.id"))
-    switched = Column(BOOLEAN,default = False)
+    switched = Column(BOOLEAN, default=False)
 
 
 class Message(Base):

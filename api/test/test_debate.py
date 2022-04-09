@@ -230,6 +230,7 @@ def test_join_debate():
     assert res7.status_code == 400
     assert res7.json().get("detail") == "Wrong Debate Status, Cannot Join Now"
 
+
 def test_message():
     global debateID
     global aliceID
@@ -237,47 +238,86 @@ def test_message():
     assert res.json().get("pro_turn") is True
     assert res.json().get("debate_id") == debateID
 
-    res2 = client.post("/room/message",
-        json={"content":"I hope this to be true","debate_id":debateID,"pro_turn":True},
-        headers={"Authorization": "Bearer " + token1})
+    res2 = client.post(
+        "/room/message",
+        json={
+            "content": "I hope this to be true",
+            "debate_id": debateID,
+            "pro_turn": True,
+        },
+        headers={"Authorization": "Bearer " + token1},
+    )
 
     assert res2.json().get("pro_turn") is False
 
-    res3 = client.post("/room/message",
-        json={"content":"I hope this to be true again","debate_id":debateID,"pro_turn":True},
-        headers={"Authorization": "Bearer " + token1})
+    res3 = client.post(
+        "/room/message",
+        json={
+            "content": "I hope this to be true again",
+            "debate_id": debateID,
+            "pro_turn": True,
+        },
+        headers={"Authorization": "Bearer " + token1},
+    )
     assert res3.status_code == 400
-    assert res3.json().get("detail") == 'Turn Match Error'
+    assert res3.json().get("detail") == "Turn Match Error"
 
-    res4 = client.post("/room/message",
-        json={"content":"I hope this to be true again","debate_id":debateID,"pro_turn":False},
-        headers={"Authorization": "Bearer " + token1})
+    res4 = client.post(
+        "/room/message",
+        json={
+            "content": "I hope this to be true again",
+            "debate_id": debateID,
+            "pro_turn": False,
+        },
+        headers={"Authorization": "Bearer " + token1},
+    )
     assert res4.status_code == 400
-    assert res4.json().get("detail") == f'User #{aliceID} cannot send message in this turn!'
+    assert (
+        res4.json().get("detail")
+        == f"User #{aliceID} cannot send message in this turn!"
+    )
 
-    res5 = client.post("/room/message",
-        json={"content":"I hope this to be true again","debate_id":debateID,"pro_turn":False},
-        headers={"Authorization": "Bearer "})
+    res5 = client.post(
+        "/room/message",
+        json={
+            "content": "I hope this to be true again",
+            "debate_id": debateID,
+            "pro_turn": False,
+        },
+        headers={"Authorization": "Bearer "},
+    )
     assert res5.status_code == 401
-    assert res5.json().get("detail") ==  'Invalid Credentials'
+    assert res5.json().get("detail") == "Invalid Credentials"
 
-    res6 = client.post("/room/message",
-        json={"content":"I don't like this","debate_id":debateID,"pro_turn":False},
-        headers={"Authorization": "Bearer "+token2})
+    res6 = client.post(
+        "/room/message",
+        json={"content": "I don't like this", "debate_id": debateID, "pro_turn": False},
+        headers={"Authorization": "Bearer " + token2},
+    )
     assert res6.status_code == 200
-    assert res6.json().get('pro_turn') is True
+    assert res6.json().get("pro_turn") is True
+
 
 def test_switch():
     global debateID
-    res = client.get(f"/room/switch/{debateID}", headers={"Authorization": "Bearer " + token1})
+    res = client.get(
+        f"/room/switch/{debateID}", headers={"Authorization": "Bearer " + token1}
+    )
     assert res.status_code == 200
     assert res.json().get("pro_turn") is False
 
-    res2 = client.post("/room/message",
-        json={"content":"This is False Continuous","debate_id":debateID,"pro_turn":False},
-        headers={"Authorization": "Bearer " + token2})
+    res2 = client.post(
+        "/room/message",
+        json={
+            "content": "This is False Continuous",
+            "debate_id": debateID,
+            "pro_turn": False,
+        },
+        headers={"Authorization": "Bearer " + token2},
+    )
     assert res2.status_code == 200
     assert res2.json().get("pro_turn") is True
+
 
 def test_leave_debate():
     global token1

@@ -203,13 +203,18 @@ def getOneDebateByTopicId(topicID: int, db: Session) -> Debate:
     # For Test Only
     return db.query(Debate).filter(Debate.topic_id == topicID).first()
 
-def getOneSwitch(debateID:int, db:Session) -> bool:
+
+def getOneSwitch(debateID: int, db: Session) -> bool:
     return db.query(Debate.switched).filter(Debate.id == debateID).first()[0]
 
-def updateSwitch(debateID:int,db:Session, new_switch:bool) -> Debate:
-    db.query(Debate).filter(Debate.id == debateID).update({"switched":new_switch}, synchronize_session="fetch")
+
+def updateSwitch(debateID: int, db: Session, new_switch: bool) -> Debate:
+    db.query(Debate).filter(Debate.id == debateID).update(
+        {"switched": new_switch}, synchronize_session="fetch"
+    )
     db.commit()
-    return getOneDebate(debateID,db)
+    return getOneDebate(debateID, db)
+
 
 def addOneDebate(userId: int, payload: schemas.Debate, db: Session) -> Debate:
     topic_info = get_one_topic(payload.topic_id, db)
@@ -229,7 +234,7 @@ def addOneDebate(userId: int, payload: schemas.Debate, db: Session) -> Debate:
         )
     if payload.start_time:
         new_Debate.start_time = payload.start_time
-    
+
     if payload.switched:
         new_Debate.switched = payload.switched
 

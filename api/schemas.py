@@ -122,7 +122,7 @@ class Debate(BaseModel):
     as_con: Optional[bool] = None
     start_time: Optional[datetime] = None
     nth_time_of_debate: Optional[int] = None
-    switched : Optional[bool] = None
+    switched: Optional[bool] = None
 
     @validator("topic_id")
     def check_topic_existance(cls, v):
@@ -286,6 +286,7 @@ class ExitDebate(BaseModel):
                 detail="Pro Position is None, Cannot Exit",
             )
         return values
+
 
 # TODO
 # 之后需要决定要不要删除Recording的相关操作
@@ -462,6 +463,7 @@ class SentSim(BaseModel):
                 detail="Sending an Empty String on Compare",
             )
         return v
+
 
 class Message(BaseModel):
     id: Optional[int] = None
