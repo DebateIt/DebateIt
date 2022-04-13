@@ -12,15 +12,6 @@ function Intro() {
         <h1 className="is-size-2 has-text-white">
           Debate It, The New Way To Debate
         </h1>
-        <button
-          type="button"
-          className="button TopicCreateButton is-large is-success has-text-info"
-          onClick={() => { navigate('/topic'); }}
-        >
-          <span className="icon is-medium">
-            <FontAwesomeIcon className="fa-lg" icon={faPlus} />
-          </span>
-        </button>
       </div>
     </div>
   );
