@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import Nlp, Utils, Topics, Users, Auth, Debates, RoomMessage
 from . import models
-from .database import SessionLocal, engine
+from .database import engine
 
 models.Base.metadata.create_all(bind=engine)
 

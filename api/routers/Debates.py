@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, Response
 from sqlalchemy.orm import Session
 from ..dependencies import get_db
 from .. import models
 from .. import schemas, auth
-from ..crud import *
+from ..crud import updateOneDebate, addOneDebate, userJoinDebate, \
+    getOneDebate, userExitDebate, IsDebateIdExist, delOneDebate
 
 router = APIRouter(prefix="/debate")
 
@@ -38,13 +39,13 @@ def leave_debate(
         if currUser.id != theDebate.pro_user_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Pro User Doesn't Match",
+                detail="Pro User Doesn't Match",
             )
     elif payload.as_con:
         if currUser.id != theDebate.con_user_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Con User Doesn't Match",
+                detail="Con User Doesn't Match",
             )
 
     return userExitDebate(currUser.id, payload, db)
@@ -55,7 +56,7 @@ def get_debate_info(id: int, db: Session = Depends(get_db)) -> models.Debate:
     if not IsDebateIdExist(id, db):
 
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Debate Not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Debate Not Found"
         )
 
     return getOneDebate(id, db)
@@ -70,7 +71,7 @@ def del_debate(
     if currUser.username != "Admin":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Only Admin can delete debate",
+            detail="Only Admin can delete debate",
         )
 
     res = delOneDebate(id, db)
@@ -81,7 +82,7 @@ def del_debate(
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"delete failed",
+            detail="delete failed",
         )
 
 
@@ -89,5 +90,5 @@ def del_debate(
 def update_debate(
     payload: schemas.UpdateDebate,
     db: Session = Depends(get_db),
-) -> Debate:
+) -> models.Debate:
     return updateOneDebate(db=db, payload=payload)

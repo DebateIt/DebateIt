@@ -1,7 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, validator, root_validator, Field
 from .database import SessionLocal
-from typing import Optional
 from fastapi import HTTPException, status
 from . import crud, auth, models
 from datetime import datetime
@@ -52,7 +51,8 @@ class UserPydantic(BaseModel):
     def passwd_cannot_be_None(cls, v):
         if v is None or v == "":
             raise HTTPException(
-                status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Invalid Password"
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="Invalid Password"
             )
         return v
 
@@ -63,7 +63,8 @@ class CreateUserPydantic(UserPydantic):
         db = SessionLocal()
         if crud.IsUserExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Username Already Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username Already Exist"
             )
         db.close()
         return v
@@ -91,7 +92,8 @@ class UpdateUserPydantic(BaseModel):
         db = SessionLocal()
         if crud.IsUserExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Username Already Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username Already Exist"
             )
         db.close()
         return v
@@ -100,7 +102,8 @@ class UpdateUserPydantic(BaseModel):
     def passwd_cannot_be_None(cls, v):
         if v is None or v == "":
             raise HTTPException(
-                status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Invalid Password"
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="Invalid Password"
             )
         return auth.pwd_context.hash(v)
 
@@ -129,7 +132,8 @@ class Debate(BaseModel):
         db = SessionLocal()
         if not crud.is_topic_existed(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Topic Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Topic Not Exist"
             )
         db.close()
         return v
@@ -145,7 +149,6 @@ class Debate(BaseModel):
 
     @root_validator
     def check_pro_con(cls, values):
-        id = values.get("id")
         pro, con = values.get("as_pro"), values.get("as_con")
 
         if pro is None and con is None:
@@ -173,7 +176,8 @@ class UpdateDebate(BaseModel):
         db = SessionLocal()
         if not crud.IsDebateIdExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Debate Not Exist"
             )
         db.close()
         return v
@@ -189,7 +193,8 @@ class JoinDebate(BaseModel):
         db = SessionLocal()
         if not crud.IsDebateIdExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Debate Not Exist"
             )
         db.close()
         return v
@@ -243,7 +248,8 @@ class ExitDebate(BaseModel):
         db = SessionLocal()
         if not crud.IsDebateIdExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Debate Not Exist"
             )
         db.close()
         return v
@@ -302,11 +308,13 @@ class Recording(BaseModel):
         db = SessionLocal()
         if not crud.IsDebateIdExist(debateID, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Debate Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Debate Not Exist"
             )
         if not crud.is_user_existed_by_id(userID, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="User Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User Not Exist"
             )
         theDebate = crud.getOneDebate(debateID, db)
         if userID != theDebate.con_user_id and userID != theDebate.pro_user_id:
@@ -328,7 +336,8 @@ class LinkRecording(BaseModel):
         db = SessionLocal()
         if not crud.IsRecIdExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Recording Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Recording Not Exist"
             )
         db.close()
         return v
@@ -362,7 +371,8 @@ class LinkRecording(BaseModel):
             if theRec.debate_id != thePrevRec.debate_id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Prev and Current Recordings Have Different Debate ID",
+                    detail="Prev and Current Recordings \
+                            Have Different Debate ID",
                 )
             if thePrevRec.next_recording_id is not None:
                 raise HTTPException(
@@ -385,7 +395,8 @@ class LinkRecording(BaseModel):
             if theRec.debate_id != theNextRec.debate_id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Next and Current Recordings Have Different Debate ID",
+                    detail="Next and Current Recordings \
+                            Have Different Debate ID",
                 )
             if theNextRec.prev_recording_id is not None:
                 raise HTTPException(
@@ -406,7 +417,8 @@ class CoLinkRecording(BaseModel):
         db = SessionLocal()
         if not crud.IsRecIdExist(v, db):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Recording Not Exist"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Recording Not Exist"
             )
         db.close()
         return v

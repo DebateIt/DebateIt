@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from ..main import app
 from ..database import SessionLocal
-from ..models import *
+from ..models import User, Topic
 
 client = TestClient(app)
 

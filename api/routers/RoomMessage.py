@@ -1,5 +1,4 @@
 from fastapi import Depends, HTTPException, status, APIRouter
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from ..dependencies import get_db
@@ -68,7 +67,7 @@ def send_message(
     if payload.pro_turn is not curr_turn:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Turn Match Error",
+            detail="Turn Match Error",
         )
     curr_deb = crud.getOneDebate(payload.debate_id, db)
     if (payload.pro_turn and curr_deb.pro_user_id != currUser.id) or (
@@ -80,7 +79,9 @@ def send_message(
         )
 
     new_message = Message(
-        content=payload.content, debate_id=payload.debate_id, user_id=currUser.id
+        content=payload.content,
+        debate_id=payload.debate_id,
+        user_id=currUser.id
     )
     db.add(new_message)
     db.commit()

@@ -35,7 +35,7 @@ def test_sentence_sim():
         "/nlp/sentence_sim",
         json={"new_topic": "Do you like feminism form in your country?"},
     )
-    assert res.status_code is 200
+    assert res.status_code == 200
     assert res.json() is None
 
     res1 = client.post(

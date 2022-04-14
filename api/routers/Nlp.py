@@ -4,8 +4,7 @@ from sentence_transformers import SentenceTransformer
 from .. import crud, schemas
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy
-
-from .. import crud, dependencies
+from .. import dependencies
 
 
 router = APIRouter(prefix="/nlp")
