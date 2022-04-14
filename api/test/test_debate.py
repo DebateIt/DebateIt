@@ -44,7 +44,8 @@ def test_init(init_db):
 
 def test_login():
     # Just get tokens from users, no need to test exceptions
-    resA = client.post("/login", json={"username": "Alice", "password": "alice"})
+    resA = client.post("/login",
+                       json={"username": "Alice", "password": "alice"})
     global token1
     token1 = resA.json().get("token_content")
     assert resA.status_code == 200
@@ -152,7 +153,9 @@ def test_add_debate():
 
     res4 = client.post(
         "/debate",
-        json={"topic_id": topicID, "as_pro": True, "start_time": "2022-02-02T12:03:00"},
+        json={"topic_id": topicID,
+              "as_pro": True,
+              "start_time": "2022-02-02T12:03:00"},
         headers={"Authorization": "Bearer " + token1},
     )
     assert res4.status_code == 400
@@ -188,7 +191,8 @@ def test_join_debate():
         headers={"Authorization": "Bearer " + token2},
     )
     assert res2.status_code == 400
-    assert res2.json().get("detail") == "Pro and Con Cannot be None at same time"
+    assert res2.json().get("detail")\
+        == "Pro and Con Cannot be None at same time"
 
     res3 = client.post(
         "/debate/join",
@@ -291,7 +295,9 @@ def test_message():
 
     res6 = client.post(
         "/room/message",
-        json={"content": "I don't like this", "debate_id": debateID, "pro_turn": False},
+        json={"content": "I don't like this",
+              "debate_id": debateID,
+              "pro_turn": False},
         headers={"Authorization": "Bearer " + token2},
     )
     assert res6.status_code == 200
@@ -301,7 +307,8 @@ def test_message():
 def test_switch():
     global debateID
     res = client.get(
-        f"/room/switch/{debateID}", headers={"Authorization": "Bearer " + token1}
+        f"/room/switch/{debateID}",
+        headers={"Authorization": "Bearer " + token1}
     )
     assert res.status_code == 200
     assert res.json().get("pro_turn") is False
@@ -375,7 +382,6 @@ def test_leave_debate():
     assert res6.status_code == 200
     assert res6.json() is True
 
-    # In this test I didn't write anything about deleting a debate & update debate.
-    # Might leave it to the refactoring.
-    # Also In the previous tests some uses delete&update.
+    # I didn't write anything about deleting or update debate
+    # Because In the previous tests some uses delete&update.
     # because I'm still not sure on how it will be used externally (as API)

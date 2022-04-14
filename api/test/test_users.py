@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 from ..main import app
-from ..database import SessionLocal
 import pytest
 from ..auth import verify_password
 
@@ -24,8 +23,11 @@ def test_get_info(init_db):
 
 
 def test_create_user():
-    res = client.post("/user", json={"username": "Simon002", "password": "002"})
-    assert verify_password("002", res.json().get("password")) is True
+    res = client.post("/user",
+                      json={"username": "Simon002", "password": "002"})
+    assert verify_password(
+        "002",
+        res.json().get("password")) is True
     assert res.status_code == 201
 
     # Pass a username that conflicts with an existing one
@@ -47,7 +49,9 @@ def test_create_user():
 
 
 def test_login():
-    res = client.post("/login", json={"username": "Simon002", "password": "002"})
+    res = client.post(
+        "/login",
+        json={"username": "Simon002", "password": "002"})
     global token
     token = res.json().get("token_content")
     assert res.status_code == 200
@@ -90,7 +94,9 @@ def test_update_user():
     assert res1.json().get("detail") == "Username Already Exist"
 
     # Send the request without providing a token
-    res2 = client.put("/user", json={"username": "Alice", "password": "Conflicts"})
+    res2 = client.put(
+        "/user",
+        json={"username": "Alice", "password": "Conflicts"})
     assert res2.status_code == 401
     assert res2.json().get("detail") == "Not authenticated"
 
@@ -122,8 +128,10 @@ def test_update_user():
     assert res.status_code == 200
 
     # Send the request without a JSON body
-    res6 = client.put("/user", json={}, headers={"Authorization": "Bearer " + token})
-    token = res5.json().get("token_content")
+    res6 = client.put("/user",
+                      json={},
+                      headers={"Authorization": "Bearer " + token})
+    token = res6.json().get("token_content")
     assert res.status_code == 200
 
 

@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from ..dependencies import get_db
 from ..models import User
 from .. import schemas, auth
-from ..crud import *
+from ..crud import delOneUser, updateOneUser, addOneUser, getAllUsers, \
+    IsUserExist, getOneUser
 
 router = APIRouter(prefix="/user")
 
@@ -25,7 +26,7 @@ def get_all_user_info(db: Session = Depends(get_db)):
 def get_user_info(username: str, db: Session = Depends(get_db)) -> User:
     if not IsUserExist(username, db):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"User Not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User Not Found"
         )
     return getOneUser(username, db)
 
@@ -44,7 +45,10 @@ def update_user(
     db: Session = Depends(get_db),
     currUser: schemas.TokenData = Depends(auth.getCurrentUser),
 ) -> User:
-    userDB = updateOneUser(db=db, username=currUser.username, new_user=payload)
+    userDB = updateOneUser(
+        db=db,
+        username=currUser.username,
+        new_user=payload)
     access_token = auth.create_access_token(
         data={"username": userDB.username, "id": userDB.id}
     )

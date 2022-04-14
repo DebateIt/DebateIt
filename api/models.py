@@ -1,4 +1,3 @@
-from email.policy import default
 from sqlalchemy import (
     Column,
     Integer,
@@ -9,7 +8,6 @@ from sqlalchemy import (
     DateTime,
     BOOLEAN,
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
 
