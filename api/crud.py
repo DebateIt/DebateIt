@@ -1,4 +1,4 @@
-from sqlalchemy import update, delete
+from sqlalchemy import update, delete, or_
 from sqlalchemy.orm import Session
 from fastapi import status, Response, HTTPException
 from datetime import datetime
@@ -324,6 +324,21 @@ def userExitDebate(userID, payload: schemas.ExitDebate, db: Session):
             schemas.UpdateDebate(id=payload.id, status=Status.End), db
         )
 
+
+def read_mine_debates(user_id: int, db):
+    return db.query(
+        Debate.id,
+        Topic.name,
+        Debate.nth_time_of_debate,
+    ).join(
+        Topic,
+        Debate.topic_id==Topic.id
+    ).filter(
+        or_(
+            Debate.pro_user_id == user_id,
+            Debate.con_user_id == user_id,
+        )
+    ).all()
 
 # def IsRecIdExist(id, db) -> bool:
 #     res = db.query(Recording).filter(Recording.id == id)

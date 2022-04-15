@@ -91,3 +91,10 @@ def update_debate(
     db: Session = Depends(get_db),
 ) -> Debate:
     return updateOneDebate(db=db, payload=payload)
+
+@router.get("/debator/{user_id}")
+def get_mine_debates(
+    user_id: int,
+    db: Session = Depends(get_db),
+) -> list[Debate]:
+    return read_mine_debates(user_id=user_id, db=db)

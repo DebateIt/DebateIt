@@ -1,11 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import jwt_decode from 'jwt-decode';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
+import DebateCard from '../components/debatecard';
+import axios from 'axios';
+
 function Main({ accessToken }) {
     const navigate = useNavigate();
+    const [debates, setDebates] = useState([]);
+
+    useEffect(() => {
+        let user_id = jwt_decode(accessToken).id;
+
+        // Remeber to change it back to using user_id
+        axios.get(
+            `http://localhost:8000/debate/debator/2`
+        ).then((res) => {
+            setDebates(res.data);
+        }).catch((err) => {
+            console.log(err.response.data.detail);
+        });
+    }, []);
+    console.log(debates);
+
+    const debateCards = debates.map(d => (
+        <DebateCard
+            key={d.id}
+            topicName={d.name}
+            nthDebate={d.nth_time_of_debate}
+        />
+    ));
 
     return (
         <div className="column">
@@ -13,15 +40,8 @@ function Main({ accessToken }) {
                 <h2 className="block has-text-white is-size-2">
                     Your Debates
                 </h2>
-                <div className="columns">
-                    <div className="column is-2">
-                        <div className="box has-background-success">
-                            <div className="content has-text-primary">
-                                Are US and China destined to have a war?
-                            </div>
-                            <span className="is-size-5 has-text-primary">#1</span>
-                        </div>
-                    </div>
+                <div>
+                    <div className="columns">{ debateCards }</div>
                 </div>
                 {/* <span className="has-text-white is-family-secondary">
                     You don't have any debates
@@ -31,9 +51,35 @@ function Main({ accessToken }) {
                 <h2 className="block has-text-white is-size-2">
                     Your Topics
                 </h2>
-                <span className="has-text-white is-family-secondary">
+                <div>
+                    <div className="columns has-text-white is-size-4">
+                        <div className="column is-three-thirds">
+                            <span>
+                                Topic
+                            </span>
+                        </div>
+                        <div className="column">
+                            <span>
+                                Number of Debates
+                            </span>
+                        </div>
+                    </div>
+                    <div className="columns has-text-white is-family-secondary">
+                        <div className="column is-three-thirds">
+                            <span>
+                                Are US and China Destined to have a war?
+                            </span>
+                        </div>
+                        <div className="column">
+                            <span>
+                                1
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {/* <span className="has-text-white is-family-secondary">
                     You don't have any topics. Click the bottom right button to create your first topic!
-                </span>
+                </span> */}
             </div>
             <button
                 type="button"
