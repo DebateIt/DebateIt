@@ -114,6 +114,10 @@ def get_one_topic(topic_id: int, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == topic_id).first()
 
 
+def read_mine_topics(user_id: int, db: Session) -> list[Topic]:
+    return db.query(Topic).filter(Topic.creator_id == user_id).all()
+
+
 def getOneTopicByName(name: str, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.name == name).first()
 

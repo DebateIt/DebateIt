@@ -9,12 +9,12 @@ import DebateCard from '../components/debatecard';
 import axios from 'axios';
 
 function Main({ accessToken }) {
+    const user_id = jwt_decode(accessToken).id;
     const navigate = useNavigate();
     const [debates, setDebates] = useState([]);
+    const [topics, setTopics] = useState([]);
 
     useEffect(() => {
-        let user_id = jwt_decode(accessToken).id;
-
         // Remeber to change it back to using user_id
         axios.get(
             `http://localhost:8000/debate/debator/2`
@@ -26,6 +26,16 @@ function Main({ accessToken }) {
     }, []);
     console.log(debates);
 
+    useEffect(() => {
+        axios.get(
+            `http://localhost:8000/topic/ownedby/2`
+        ).then((res) => {
+            setTopics(res.data);
+        }).catch((err) => {
+            console.log(err.response.data.detail);
+        });
+    }, []);
+
     const debateCards = debates.map(d => (
         <DebateCard
             key={d.id}
@@ -33,6 +43,21 @@ function Main({ accessToken }) {
             nthDebate={d.nth_time_of_debate}
         />
     ));
+
+    const topicRows = topics.map(t => (
+        <div key={t.id} className="columns has-text-white is-family-secondary">
+            <div className="column is-three-thirds">
+                <span>
+                    { t.name }
+                </span>
+            </div>
+            <div className="column">
+                <span>
+                    { t.num_of_debates }
+                </span>
+            </div>
+        </div>
+    ))
 
     return (
         <div className="column">
@@ -64,18 +89,7 @@ function Main({ accessToken }) {
                             </span>
                         </div>
                     </div>
-                    <div className="columns has-text-white is-family-secondary">
-                        <div className="column is-three-thirds">
-                            <span>
-                                Are US and China Destined to have a war?
-                            </span>
-                        </div>
-                        <div className="column">
-                            <span>
-                                1
-                            </span>
-                        </div>
-                    </div>
+                    { topicRows }
                 </div>
                 {/* <span className="has-text-white is-family-secondary">
                     You don't have any topics. Click the bottom right button to create your first topic!
