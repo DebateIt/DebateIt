@@ -92,6 +92,7 @@ def update_debate(
 ) -> Debate:
     return updateOneDebate(db=db, payload=payload)
 
+
 @router.get("/debator/{user_id}")
 def get_mine_debates(
     user_id: int,

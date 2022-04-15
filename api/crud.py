@@ -326,19 +326,22 @@ def userExitDebate(userID, payload: schemas.ExitDebate, db: Session):
 
 
 def read_mine_debates(user_id: int, db):
-    return db.query(
-        Debate.id,
-        Topic.name,
-        Debate.nth_time_of_debate,
-    ).join(
-        Topic,
-        Debate.topic_id==Topic.id
-    ).filter(
-        or_(
-            Debate.pro_user_id == user_id,
-            Debate.con_user_id == user_id,
+    return (
+        db.query(
+            Debate.id,
+            Topic.name,
+            Debate.nth_time_of_debate,
         )
-    ).all()
+        .join(Topic, Debate.topic_id == Topic.id)
+        .filter(
+            or_(
+                Debate.pro_user_id == user_id,
+                Debate.con_user_id == user_id,
+            )
+        )
+        .all()
+    )
+
 
 # def IsRecIdExist(id, db) -> bool:
 #     res = db.query(Recording).filter(Recording.id == id)
