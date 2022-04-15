@@ -92,9 +92,7 @@ def delete_topic(
             status_code=status.HTTP_404_NOT_FOUND, detail="Topic Not Found"
         )
 
+
 @router.get("/ownedby/{user_id}")
-def get_mine_topics(
-    user_id: int,
-    db: Session = Depends(get_db)
-) -> list[Topic]:
+def get_mine_topics(user_id: int, db: Session = Depends(get_db)) -> list[Topic]:
     return read_mine_topics(user_id=user_id, db=db)
