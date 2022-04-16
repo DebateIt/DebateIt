@@ -47,9 +47,9 @@ function Main({ accessToken }) {
     const topicRows = topics.map(t => (
         <div key={t.id} className="columns has-text-white is-family-secondary">
             <div className="column is-three-thirds">
-                <span>
+                <a className="has-text-white">
                     { t.name }
-                </span>
+                </a>
             </div>
             <div className="column">
                 <span>
@@ -66,34 +66,42 @@ function Main({ accessToken }) {
                     Your Debates
                 </h2>
                 <div>
-                    <div className="columns">{ debateCards }</div>
+                    {
+                        debateCards.length
+                        ? <div className="columns">{ debateCards }</div>
+                        : <span className="has-text-white is-family-secondary">
+                            You don't have any debates
+                        </span>
+                    }
                 </div>
-                {/* <span className="has-text-white is-family-secondary">
-                    You don't have any debates
-                </span> */}
             </div>
             <div className="section">
                 <h2 className="block has-text-white is-size-2">
                     Your Topics
                 </h2>
                 <div>
-                    <div className="columns has-text-white is-size-4">
-                        <div className="column is-three-thirds">
-                            <span>
-                                Topic
-                            </span>
-                        </div>
-                        <div className="column">
-                            <span>
-                                Number of Debates
-                            </span>
-                        </div>
-                    </div>
-                    { topicRows }
+                    {
+                        topicRows.length
+                        ? (<div>
+                            <div className="columns has-text-white is-size-4">
+                                <div className="column is-three-thirds">
+                                    <span>
+                                        Topic
+                                    </span>
+                                </div>
+                                <div className="column">
+                                    <span>
+                                        Number of Debates
+                                    </span>
+                                </div>
+                            </div>
+                            { topicRows }
+                        </div>)
+                        : <span className="has-text-white is-family-secondary">
+                            You don't have any topics. Click the bottom right button to create your first topic!
+                        </span>
+                    }
                 </div>
-                {/* <span className="has-text-white is-family-secondary">
-                    You don't have any topics. Click the bottom right button to create your first topic!
-                </span> */}
             </div>
             <button
                 type="button"
