@@ -1,20 +1,34 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useParams } from "react-router-dom";
 
-import Button from '../components/button';
+function Topic() {
+    const params = useParams();
+    const topicId = params.topicId;
+    const [topic, setTopic] = useState({});
 
-function Topic({ accessToken }) {
+    useEffect(() => {
+        axios.get(
+            `http://localhost:8000/topic/${topicId}`
+        ).then((res) => {
+            setTopic(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }, []);
+
     return (
         <div className="column">
             <div className="section">
                 <div className="content">
                     <h2 className="has-text-white is-size-2">
-                        Should we ban racial slurs on internet?
+                        { topic.name }
                     </h2>
                     <h4 className="has-text-white">
-                        Number of Debates: 3
+                        Number of Debates: { topic.num_of_debates }
                     </h4>
                     <p className="has-text-white is-family-secondary">
-                        asdl;fkjasl;dfjaslk;dfj
+                        { topic.description }
                     </p>
                 </div>
                 <div className="buttons">

@@ -47,7 +47,7 @@ function Main({ accessToken }) {
     const topicRows = topics.map(t => (
         <div key={t.id} className="columns has-text-white is-family-secondary">
             <div className="column is-three-thirds">
-                <a className="has-text-white">
+                <a href={ `/topic/${t.id}` } className="has-text-white">
                     { t.name }
                 </a>
             </div>
