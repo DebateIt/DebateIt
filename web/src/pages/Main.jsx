@@ -28,7 +28,7 @@ function Main({ accessToken }) {
 
     useEffect(() => {
         axios.get(
-            `http://localhost:8000/topic/ownedby/2`
+            `http://localhost:8000/topic/ownedby/${user_id}`
         ).then((res) => {
             setTopics(res.data);
         }).catch((err) => {
@@ -39,6 +39,7 @@ function Main({ accessToken }) {
     const debateCards = debates.map(d => (
         <DebateCard
             key={d.id}
+            debateId={d.id}
             topicName={d.name}
             nthDebate={d.nth_time_of_debate}
         />

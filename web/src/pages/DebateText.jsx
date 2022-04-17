@@ -56,12 +56,12 @@ function DebateText() {
       <div className="level">
         <div className="level-left">
           <div className="level-item">
-            <p className="is-size-2 has-text-white">For</p>
+            <p className="is-size-2 has-text-white">Opposition</p>
           </div>
         </div>
         <div className="level-right">
           <div className="level-item has-text-right">
-            <p className="is-size-2 has-text-white">Against</p>
+            <p className="is-size-2 has-text-white">Proposition</p>
           </div>
         </div>
       </div>

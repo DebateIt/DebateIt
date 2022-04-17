@@ -31,12 +31,13 @@ function App() {
             element={ accessToken ? (<Main accessToken={accessToken} />) : (<Intro />) }
           />
           <Route
-            path="topic"
+            path="/topic"
             element={(<TopicCreate accessToken={accessToken} />)}
           />
-          <Route path="topic/:topicId" element={(<Topic />)} />
+          <Route path="/topic/:topicId" element={(<Topic />)} />
+          <Route path="/debate/:debateId" element={(<DebateText />)} />
           <Route
-            path="login"
+            path="/login"
             element={(
               <Login
                 accessToken={accessToken}
@@ -45,13 +46,13 @@ function App() {
             )}
           />
           <Route
-            path="register"
+            path="/register"
             element={
               <Registration />
             }
           />
           <Route
-            path="user"
+            path="/user"
             element={(
               <User
                 accessToken={accessToken}
