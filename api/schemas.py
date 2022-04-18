@@ -139,7 +139,6 @@ class Debate(BaseModel):
     def check_time(cls, v):
         v = v.replace(tzinfo=None)
 
-        print(v.tzinfo, datetime.now().tzinfo)
         if v < datetime.now():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

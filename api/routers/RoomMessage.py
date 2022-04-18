@@ -17,12 +17,14 @@ def determine_turn(debate_id: int, db: Session) -> bool:
 
 @router.get("/history/{debateID}")
 def get_debate_history(debateID: int, db: Session = Depends(get_db)):
-    return (
-        db.query(Message)
+    return {
+        "pro_turn": determine_turn(debateID, db),
+        "debate": crud.getOneDebate(debateID, db),
+        "history": db.query(Message)
         .filter(Message.debate_id == debateID)
         .order_by(Message.id)
         .all()
-    )
+    }
 
 
 @router.get("/initialize/{debateID}")

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function ChatInputBox({
-  name, onChange, value,
+  name, onChange, value, disabled
 }) {
   return (
     <div className="field is-horizontal">
@@ -10,12 +10,13 @@ function ChatInputBox({
         <div className="field">
           <p className="control is-expanded">
             <input
-              className="input is-family-secondary"
+              className="input is-family-secondary has-background-primary"
               type="text"
               placeholder={name}
               id={name}
               onChange={onChange}
               value={value}
+              disabled={disabled}
             />
           </p>
         </div>
@@ -27,8 +28,8 @@ function ChatInputBox({
 ChatInputBox.propTypes = {
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  helpInfo: PropTypes.string,
   value: PropTypes.string,
+  disabled: PropTypes.bool
 };
 
 export default ChatInputBox;

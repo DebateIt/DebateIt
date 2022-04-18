@@ -14,19 +14,20 @@ function DebateText({ accessToken }) {
   const [isMePro, setIsMePro] = useState(false);
   const [messageContent, setMessageContent] = useState("");
   const [history, setHistory] = useState([]);
-
-  
-  const messages = history.map(mes => {
-    return (
-      <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
-    );
-  });
+  const [onHold, setOnHold] = useState(true);
+  const [periodicPing, setPeriodicPing] = useState();
 
   const readHistory = () => {
     axios.get(
       `http://localhost:8000/room/history/${debateId}`
     ).then((res) => {
-      setHistory(res.data);
+      setHistory(res.data.history);
+      setIsProTurn(res.data.pro_turn);
+      console.log(res.data.debate.con_user_id);
+      console.log(res.data.debate.pro_user_id);
+      setOnHold(
+        res.data.debate.con_user_id === null || res.data.debate.pro_user_id === null
+      );
     }).catch((err) => {
       console.log(err);
     });
@@ -59,13 +60,8 @@ function DebateText({ accessToken }) {
   // if the other user has already sent a message or not. Or we can setup
   // a websocket server to let the backend update the history data on the
   // frontend
-  useEffect(() => {
-    setTimeout(readHistory, 1000);
-  });
 
   useEffect(() => {
-    readHistory();
-
     axios.get(
       `http://localhost:8000/debate/${debateId}`
     ).then((res) => {
@@ -73,15 +69,19 @@ function DebateText({ accessToken }) {
     }).catch((err) => {
       console.log(err);
     });
-
-    axios.get(
-      `http://localhost:8000/room/initialize/${debateId}`
-    ).then((res) => {
-      setIsProTurn(res.data.pro_turn);
-    }).catch((err) => {
-      console.log(err);
-    });
+    
+    readHistory();
   }, []);
+
+  useEffect(() => {
+    setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
+  }, []);
+
+  const messages = history.map(mes => {
+    return (
+      <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
+    );
+  });
 
   return (
     <div className="column is-flex is-flex-direction-column">
@@ -90,6 +90,7 @@ function DebateText({ accessToken }) {
           <div className="level-item">
             <p className="is-size-2 has-text-white">
               { isMePro ? "Opposition" : "Proposition" }
+              { onHold ? " (Pending...)" : "" }
             </p>
           </div>
         </div>
@@ -115,6 +116,7 @@ function DebateText({ accessToken }) {
             name="Send Your Argument and Rebuttal"
             onChange={fieldOnChange(setMessageContent)}
             value={messageContent}
+            disabled={isMePro !== isProTurn}
           />
         </div>
         <div className="column">
@@ -123,6 +125,7 @@ function DebateText({ accessToken }) {
               type="button"
               className="button is-success has-text-info is-fullwidth"
               onClick={send}
+              disabled={isMePro !== isProTurn}
             >
               Send
             </button>
