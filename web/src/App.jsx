@@ -34,7 +34,7 @@ function App() {
             path="/topic"
             element={(<TopicCreate accessToken={accessToken} />)}
           />
-          <Route path="/topic/:topicId" element={(<Topic />)} />
+          <Route path="/topic/:topicId" element={(<Topic accessToken={accessToken} />)} />
           <Route path="/debate/:debateId" element={(<DebateText accessToken={accessToken} />)} />
           <Route
             path="/login"

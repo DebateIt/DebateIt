@@ -1,11 +1,31 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-function Topic() {
+function Topic({ accessToken }) {
+    const navigate = useNavigate();
     const params = useParams();
     const topicId = params.topicId;
     const [topic, setTopic] = useState({});
+
+    const initiateDebate = (asPro) => () => {
+        let params = {
+            topic_id: topicId,
+            start_time: Date.now(),
+        }
+        if (asPro) params.as_pro = true;
+        else params.as_con = true;
+
+        axios.post('http://localhost:8000/debate', params, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        }).then((res) => {
+            navigate(`/debate/${res.data.id}`);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
 
     useEffect(() => {
         axios.get(
@@ -32,10 +52,16 @@ function Topic() {
                     </p>
                 </div>
                 <div className="buttons">
-                    <button className="button is-medium is-success has-text-info">
+                    <button 
+                        className="button is-medium is-success has-text-info"
+                        onClick={initiateDebate(true)}
+                    >
                         Debate It for proposition!
                     </button>
-                    <button className="button is-medium is-success has-text-info">
+                    <button 
+                        className="button is-medium is-success has-text-info"
+                        onClick={initiateDebate(false)}
+                    >
                         Debate It for opposition!
                     </button>
                 </div>

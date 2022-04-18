@@ -62,8 +62,10 @@ function DebateText({ accessToken }) {
   useEffect(() => {
     setTimeout(readHistory, 1000);
   });
-  
+
   useEffect(() => {
+    readHistory();
+
     axios.get(
       `http://localhost:8000/debate/${debateId}`
     ).then((res) => {

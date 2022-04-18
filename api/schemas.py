@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from . import crud, auth, models
 from datetime import datetime
+import pytz
 
 
 class Topic(BaseModel):
@@ -136,6 +137,9 @@ class Debate(BaseModel):
 
     @validator("start_time")
     def check_time(cls, v):
+        v = v.replace(tzinfo=None)
+
+        print(v.tzinfo, datetime.now().tzinfo)
         if v < datetime.now():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

@@ -24,11 +24,10 @@ function Main({ accessToken }) {
             console.log(err.response.data.detail);
         });
     }, []);
-    console.log(debates);
 
     useEffect(() => {
         axios.get(
-            `http://localhost:8000/topic/ownedby/${user_id}`
+            `http://localhost:8000/topic`
         ).then((res) => {
             setTopics(res.data);
         }).catch((err) => {
@@ -78,7 +77,7 @@ function Main({ accessToken }) {
             </div>
             <div className="section">
                 <h2 className="block has-text-white is-size-2">
-                    Your Topics
+                    All Topics
                 </h2>
                 <div>
                     {
@@ -99,7 +98,7 @@ function Main({ accessToken }) {
                             { topicRows }
                         </div>)
                         : <span className="has-text-white is-family-secondary">
-                            You don't have any topics. Click the bottom right button to create your first topic!
+                            We currently don't have any topics. Click the bottom right button to create one!
                         </span>
                     }
                 </div>
