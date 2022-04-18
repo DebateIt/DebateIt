@@ -23,7 +23,7 @@ def get_debate_history(debateID: int, db: Session = Depends(get_db)):
         "history": db.query(Message)
         .filter(Message.debate_id == debateID)
         .order_by(Message.id)
-        .all()
+        .all(),
     }
 
 
