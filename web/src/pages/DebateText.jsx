@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
 import ChatInputBox from '../components/chatinputbox';
 import Message from '../components/message';
 
-function DebateText() {
-  const myUserId = 28;
+function DebateText({ accessToken }) {
+  const params = useParams();
+  const debateId = params.debateId;
+  const myUserId = jwt_decode(accessToken).id;
+  const [isProTurn, setIsProTurn] = useState(false);
+  const [isMePro, setIsMePro] = useState(false);
   const [messageContent, setMessageContent] = useState("");
   const [history, setHistory] = useState([]);
 
@@ -18,7 +24,7 @@ function DebateText() {
 
   const readHistory = () => {
     axios.get(
-      'http://localhost:8000/history'
+      `http://localhost:8000/room/history/${debateId}`
     ).then((res) => {
       setHistory(res.data);
     }).catch((err) => {
@@ -27,15 +33,21 @@ function DebateText() {
   }
   
   const send = () => {
-    axios.post('http://localhost:8000/message', {
+    axios.post('http://localhost:8000/room/message', {
       "content": messageContent,
-      "user_id": myUserId,
+      "debate_id": debateId,
+      "pro_turn": isProTurn,
+    }, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     }).then((res) => {
       setMessageContent("");
       readHistory();
+      setIsProTurn(res.data.pro_turn);
     }).catch((err) => {
       console.log(err);
-    })
+    });
   }
   
   const fieldOnChange = (setState) => (event) => {
@@ -50,18 +62,40 @@ function DebateText() {
   useEffect(() => {
     setTimeout(readHistory, 1000);
   });
+  
+  useEffect(() => {
+    axios.get(
+      `http://localhost:8000/debate/${debateId}`
+    ).then((res) => {
+      setIsMePro(res.data.pro_user_id === myUserId);
+    }).catch((err) => {
+      console.log(err);
+    });
+
+    axios.get(
+      `http://localhost:8000/room/initialize/${debateId}`
+    ).then((res) => {
+      setIsProTurn(res.data.pro_turn);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, []);
 
   return (
     <div className="column is-flex is-flex-direction-column">
       <div className="level">
         <div className="level-left">
           <div className="level-item">
-            <p className="is-size-2 has-text-white">Opposition</p>
+            <p className="is-size-2 has-text-white">
+              { isMePro ? "Opposition" : "Proposition" }
+            </p>
           </div>
         </div>
         <div className="level-right">
           <div className="level-item has-text-right">
-            <p className="is-size-2 has-text-white">Proposition</p>
+            <p className="is-size-2 has-text-white">
+              { isMePro ? "Proposition" : "Opposition" }
+            </p>
           </div>
         </div>
       </div>
