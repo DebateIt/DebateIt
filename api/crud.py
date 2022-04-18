@@ -113,6 +113,7 @@ def create_one_topic(
 def get_one_topic(topic_id: int, db: Session) -> Topic:
     return db.query(Topic).filter(Topic.id == topic_id).first()
 
+
 def get_all_topics(db: Session) -> list[Topic]:
     return db.query(Topic).all()
 
