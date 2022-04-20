@@ -16,10 +16,13 @@ function DebateText({ accessToken }) {
   const debateId = params.debateId;
   const myUserId = jwt_decode(accessToken).id;
   const [isProTurn, setIsProTurn] = useState(false);
-  const [isMePro, setIsMePro] = useState(false);
+  const [isMePro, setIsMePro] = useState(true);
   const [messageContent, setMessageContent] = useState("");
   const [history, setHistory] = useState([]);
-  const [onHold, setOnHold] = useState(true);
+  const [proOnHold, setProOnHold] = useState(true);
+  const [conOnHold, setConOnHold] = useState(true);
+  const [proUserId, setProUserId] = useState();
+  const [conUserId, setConUserId] = useState();
   const [periodicPing, setPeriodicPing] = useState();
   const [topicName, setTopicName] = useState("");
   const [mode, setMode] = useState(AUDIENCE);
@@ -30,9 +33,8 @@ function DebateText({ accessToken }) {
     ).then((res) => {
       setHistory(res.data.history);
       setIsProTurn(res.data.pro_turn);
-      setOnHold(
-        res.data.debate.con_user_id === null || res.data.debate.pro_user_id === null
-      );
+      setProOnHold(res.data.debate.pro_user_id === null);
+      setConOnHold(res.data.debate.con_user_id === null);
     }).catch((err) => {
       console.log(err);
     });
@@ -86,7 +88,22 @@ function DebateText({ accessToken }) {
     axios.get(
       `http://localhost:8000/debate/${debateId}`
     ).then((res) => {
-      setIsMePro(res.data.pro_user_id === myUserId);
+      setProUserId(res.data.pro_user_id);
+      setConUserId(res.data.con_user_id);
+
+      if (res.data.status === 4) {
+        setMode(REVIEW);
+        return Promise.resolve(res.data.topic_id);
+      }
+
+      if (res.data.pro_user_id === myUserId) {
+        setIsMePro(true);
+        setMode(DEBATOR);
+      } else if (res.data.con_user_id === myUserId) {
+        setIsMePro(false);
+        setMode(DEBATOR);
+      }
+
       return Promise.resolve(res.data.topic_id);
     }).then((topicId) => {
       axios.get(
@@ -104,11 +121,7 @@ function DebateText({ accessToken }) {
     setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
   }, []);
 
-  const messages = history.map(mes => {
-    return (
-      <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
-    );
-  });
+  console.log(mode);
 
   return (
     <div className="column is-flex is-flex-direction-column">
@@ -120,7 +133,11 @@ function DebateText({ accessToken }) {
           <div className="level-item">
             <p className="is-size-2 has-text-white">
               { isMePro ? "Opposition" : "Proposition" }
-              { onHold ? " (Pending...)" : "" }
+              {
+                (isMePro && conOnHold || !isMePro && proOnHold) ? 
+                (mode === REVIEW ? " (Done)" : " (Pending...)") :
+                ""
+              }
             </p>
           </div>
         </div>
@@ -128,6 +145,11 @@ function DebateText({ accessToken }) {
           <div className="level-item has-text-right">
             <p className="is-size-2 has-text-white">
               { isMePro ? "Proposition" : "Opposition" }
+              {
+                (isMePro && proOnHold || !isMePro && conOnHold) ?
+                (mode === REVIEW ? " (Done)" : " (Pending...)") :
+                ""
+              }
             </p>
           </div>
         </div>
@@ -138,41 +160,59 @@ function DebateText({ accessToken }) {
           overflow: 'scroll',
         }}
       >
-        {messages}
+        {
+          history.map(mes => {
+            return (
+              <Message
+                content={mes.content}
+                isYourTurn={mes.user_id===(isMePro ? proUserId : conUserId)}
+              />
+            );
+          })
+        }
       </div>
-      <div className="columns is-variable is-1 has-background-info">
-        <div className="column is-10">
-          <ChatInputBox
-            name="Send Your Argument and Rebuttal"
-            onChange={fieldOnChange(setMessageContent)}
-            value={messageContent}
-            disabled={isMePro !== isProTurn}
-          />
-        </div>
-        <div className="column">
-          <div className="control">
-            <button
-              type="button"
-              className="button is-success has-text-info is-fullwidth"
-              onClick={send}
-              disabled={isMePro !== isProTurn}
-            >
-              Send
-            </button>
+      {
+        mode !== DEBATOR ?
+        "" :
+        (
+          <div
+            className="columns is-variable is-1 has-background-info"
+            hidden={ mode !== DEBATOR }
+          >
+            <div className="column is-10">
+              <ChatInputBox
+                name="Send Your Argument and Rebuttal"
+                onChange={fieldOnChange(setMessageContent)}
+                value={messageContent}
+                disabled={isMePro !== isProTurn}
+              />
+            </div>
+            <div className="column">
+              <div className="control">
+                <button
+                  type="button"
+                  className="button is-success has-text-info is-fullwidth"
+                  onClick={send}
+                  disabled={isMePro !== isProTurn}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+            <div className="column">
+              <div className="control">
+                <button
+                  type="button"
+                  className="button is-primary has-text-white is-fullwidth"
+                  onClick={exit}
+                >
+                  Exit
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="column">
-          <div className="control">
-            <button
-              type="button"
-              className="button is-primary has-text-white is-fullwidth"
-              onClick={exit}
-            >
-              Exit
-            </button>
-          </div>
-        </div>
-      </div>
+        )
+      }
     </div>
   );
 }
