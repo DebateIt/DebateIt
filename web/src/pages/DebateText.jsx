@@ -16,6 +16,8 @@ function DebateText({ accessToken }) {
   const [history, setHistory] = useState([]);
   const [onHold, setOnHold] = useState(true);
   const [periodicPing, setPeriodicPing] = useState();
+  const [topicId, setTopicId] = useState();
+  const [topicName, setTopicName] = useState("")
 
   const readHistory = () => {
     axios.get(
@@ -23,8 +25,6 @@ function DebateText({ accessToken }) {
     ).then((res) => {
       setHistory(res.data.history);
       setIsProTurn(res.data.pro_turn);
-      console.log(res.data.debate.con_user_id);
-      console.log(res.data.debate.pro_user_id);
       setOnHold(
         res.data.debate.con_user_id === null || res.data.debate.pro_user_id === null
       );
@@ -66,6 +66,7 @@ function DebateText({ accessToken }) {
       `http://localhost:8000/debate/${debateId}`
     ).then((res) => {
       setIsMePro(res.data.pro_user_id === myUserId);
+      setTopicId(res.data.topic_id);
     }).catch((err) => {
       console.log(err);
     });
@@ -77,6 +78,16 @@ function DebateText({ accessToken }) {
     setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
   }, []);
 
+  useEffect(() => {
+    axios.get(
+      `http://localhost:8000/topic/${topicId}`
+    ).then((res) => {
+      setTopicName(res.data.name);
+    }).catch((err) => {
+      console.log(err);
+    });
+  });
+
   const messages = history.map(mes => {
     return (
       <Message content={mes.content} isYourTurn={mes.user_id===myUserId} />
@@ -85,6 +96,9 @@ function DebateText({ accessToken }) {
 
   return (
     <div className="column is-flex is-flex-direction-column">
+      <h1 className="has-text-white is-size-4 is-flex is-align-self-center">
+        { topicName }
+      </h1>
       <div className="level">
         <div className="level-left">
           <div className="level-item">

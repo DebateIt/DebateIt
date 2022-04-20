@@ -17,7 +17,7 @@ function Main({ accessToken }) {
     useEffect(() => {
         // Remeber to change it back to using user_id
         axios.get(
-            `http://localhost:8000/debate/debator/2`
+            `http://localhost:8000/debate/debator/${user_id}`
         ).then((res) => {
             setDebates(res.data);
         }).catch((err) => {
