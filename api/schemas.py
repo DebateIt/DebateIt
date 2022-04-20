@@ -5,7 +5,6 @@ from typing import Optional
 from fastapi import HTTPException, status
 from . import crud, auth, models
 from datetime import datetime
-import pytz
 
 
 class Topic(BaseModel):

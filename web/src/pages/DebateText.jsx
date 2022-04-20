@@ -16,7 +16,6 @@ function DebateText({ accessToken }) {
   const [history, setHistory] = useState([]);
   const [onHold, setOnHold] = useState(true);
   const [periodicPing, setPeriodicPing] = useState();
-  const [topicId, setTopicId] = useState();
   const [topicName, setTopicName] = useState("")
 
   const readHistory = () => {
@@ -32,7 +31,7 @@ function DebateText({ accessToken }) {
       console.log(err);
     });
   }
-  
+
   const send = () => {
     axios.post('http://localhost:8000/room/message', {
       "content": messageContent,
@@ -66,27 +65,22 @@ function DebateText({ accessToken }) {
       `http://localhost:8000/debate/${debateId}`
     ).then((res) => {
       setIsMePro(res.data.pro_user_id === myUserId);
-      setTopicId(res.data.topic_id);
+      return Promise.resolve(res.data.topic_id);
+    }).then((topicId) => {
+      axios.get(
+        `http://localhost:8000/topic/${topicId}`
+      ).then((res) => {
+        setTopicName(res.data.name);
+      }).catch((err) => {
+        console.log(err);
+      });
     }).catch((err) => {
       console.log(err);
     });
-    
-    readHistory();
-  }, []);
 
-  useEffect(() => {
+    readHistory();
     setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
   }, []);
-
-  useEffect(() => {
-    axios.get(
-      `http://localhost:8000/topic/${topicId}`
-    ).then((res) => {
-      setTopicName(res.data.name);
-    }).catch((err) => {
-      console.log(err);
-    });
-  });
 
   const messages = history.map(mes => {
     return (
