@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
@@ -7,6 +7,11 @@ import ChatInputBox from '../components/chatinputbox';
 import Message from '../components/message';
 
 function DebateText({ accessToken }) {
+  const DEBATOR = 0;
+  const AUDIENCE = 1;
+  const REVIEW = 2;
+
+  const navigate = useNavigate();
   const params = useParams();
   const debateId = params.debateId;
   const myUserId = jwt_decode(accessToken).id;
@@ -16,7 +21,8 @@ function DebateText({ accessToken }) {
   const [history, setHistory] = useState([]);
   const [onHold, setOnHold] = useState(true);
   const [periodicPing, setPeriodicPing] = useState();
-  const [topicName, setTopicName] = useState("")
+  const [topicName, setTopicName] = useState("");
+  const [mode, setMode] = useState(AUDIENCE);
 
   const readHistory = () => {
     axios.get(
@@ -45,6 +51,22 @@ function DebateText({ accessToken }) {
       setMessageContent("");
       readHistory();
       setIsProTurn(res.data.pro_turn);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  const exit = () => {
+    axios.post('http://localhost:8000/debate/exit', {
+      id: debateId,
+      as_pro: isMePro,
+      as_con: !isMePro,
+    }, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }).then((res) => {
+      navigate('/');
     }).catch((err) => {
       console.log(err);
     });
@@ -119,7 +141,7 @@ function DebateText({ accessToken }) {
         {messages}
       </div>
       <div className="columns is-variable is-1 has-background-info">
-        <div className="column is-11">
+        <div className="column is-10">
           <ChatInputBox
             name="Send Your Argument and Rebuttal"
             onChange={fieldOnChange(setMessageContent)}
@@ -136,6 +158,17 @@ function DebateText({ accessToken }) {
               disabled={isMePro !== isProTurn}
             >
               Send
+            </button>
+          </div>
+        </div>
+        <div className="column">
+          <div className="control">
+            <button
+              type="button"
+              className="button is-primary has-text-white is-fullwidth"
+              onClick={exit}
+            >
+              Exit
             </button>
           </div>
         </div>

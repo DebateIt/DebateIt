@@ -31,7 +31,7 @@ function Login({ accessToken, resetAccessToken }) {
     }).then((res) => {
       localStorage.setItem('access_token', res.data.token_content);
       resetAccessToken();
-      navigate('/user');
+      navigate('/');
     }).catch((err) => {
       setUsernameInfo(err.response.data.detail);
     });
