@@ -300,37 +300,41 @@ def userJoinDebate(userID, payload: schemas.JoinDebate, db: Session) -> Debate:
 
 
 def userExitDebate(userID, payload: schemas.ExitDebate, db: Session):
-    if payload.as_pro:
-        db.query(Debate).filter(Debate.id == payload.id).update(
-            {"pro_user_id": None}, synchronize_session="fetch"
-        )
-    elif payload.as_con:
-        db.query(Debate).filter(Debate.id == payload.id).update(
-            {"con_user_id": None}, synchronize_session="fetch"
-        )
+    # if payload.as_pro:
+    #     db.query(Debate).filter(Debate.id == payload.id).update(
+    #         {"pro_user_id": None}, synchronize_session="fetch"
+    #     )
+    # elif payload.as_con:
+    #     db.query(Debate).filter(Debate.id == payload.id).update(
+    #         {"con_user_id": None}, synchronize_session="fetch"
+    #     )
 
-    db.commit()
+    # db.commit()
 
-    new_deb = getOneDebate(payload.id, db)
+    # new_deb = getOneDebate(payload.id, db)
 
-    # This paragraph as a whole are idealized, but after that can continue to design
-    if new_deb.status is Status.End:
-        # End -> Another Party Leave debate -> change status to FINISHED
-        return updateOneDebate(
-            schemas.UpdateDebate(id=payload.id, status=Status.Finish), db
-        )
-    elif (
-        new_deb.status is Status.BeforeDebate
-        and new_deb.con_user_id is None
-        and new_deb.pro_user_id is None
-    ):
-        # Another Party Not Joined & Creator Leaves -> delete this debate
-        return delOneDebate(new_deb.id, db)
-    else:
-        # Debate is over -> one party left first.
-        return updateOneDebate(
-            schemas.UpdateDebate(id=payload.id, status=Status.End), db
-        )
+    # # This paragraph as a whole are idealized, but after that can continue to design
+    # if new_deb.status is Status.End:
+    #     # End -> Another Party Leave debate -> change status to FINISHED
+    #     return updateOneDebate(
+    #         schemas.UpdateDebate(id=payload.id, status=Status.Finish), db
+    #     )
+    # elif (
+    #     new_deb.status is Status.BeforeDebate
+    #     and new_deb.con_user_id is None
+    #     and new_deb.pro_user_id is None
+    # ):
+    #     # Another Party Not Joined & Creator Leaves -> delete this debate
+    #     return delOneDebate(new_deb.id, db)
+    # else:
+    #     # Debate is over -> one party left first.
+    #     return updateOneDebate(
+    #         schemas.UpdateDebate(id=payload.id, status=Status.End), db
+    #     )
+
+    return updateOneDebate(
+        schemas.UpdateDebate(id=payload.id, status=Status.Finish), db
+    )
 
 
 def read_mine_debates(user_id: int, db):
@@ -339,6 +343,7 @@ def read_mine_debates(user_id: int, db):
             Debate.id,
             Topic.name,
             Debate.nth_time_of_debate,
+            Debate.status,
         )
         .join(Topic, Debate.topic_id == Topic.id)
         .filter(

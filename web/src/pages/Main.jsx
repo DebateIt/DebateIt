@@ -15,11 +15,12 @@ function Main({ accessToken }) {
     const [topics, setTopics] = useState([]);
 
     useEffect(() => {
-        // Remeber to change it back to using user_id
         axios.get(
             `http://localhost:8000/debate/debator/${user_id}`
         ).then((res) => {
-            setDebates(res.data);
+            res.data.sort((a, b) => (b.id - a.id))
+            res.data.sort((a, b) => (b.status - a.status));
+            setDebates(res.data.reverse());
         }).catch((err) => {
             console.log(err.response.data.detail);
         });
@@ -41,6 +42,7 @@ function Main({ accessToken }) {
             debateId={d.id}
             topicName={d.name}
             nthDebate={d.nth_time_of_debate}
+            isActive={d.status !== 4}
         />
     ));
 

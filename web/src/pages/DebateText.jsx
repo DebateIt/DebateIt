@@ -35,6 +35,19 @@ function DebateText({ accessToken }) {
       setIsProTurn(res.data.pro_turn);
       setProOnHold(res.data.debate.pro_user_id === null);
       setConOnHold(res.data.debate.con_user_id === null);
+
+      setProUserId(res.data.debate.pro_user_id);
+      setConUserId(res.data.debate.con_user_id);
+
+      setIsMePro(myUserId !== res.data.debate.con_user_id);
+
+      if (res.data.debate.status === 4) {
+        setMode(REVIEW);
+      } else if (myUserId === res.data.debate.pro_user_id || myUserId === res.data.debate.con_user_id) {
+        setMode(DEBATOR);
+      } else {
+        setMode(AUDIENCE);
+      }
     }).catch((err) => {
       console.log(err);
     });
@@ -88,22 +101,6 @@ function DebateText({ accessToken }) {
     axios.get(
       `http://localhost:8000/debate/${debateId}`
     ).then((res) => {
-      setProUserId(res.data.pro_user_id);
-      setConUserId(res.data.con_user_id);
-
-      if (res.data.status === 4) {
-        setMode(REVIEW);
-        return Promise.resolve(res.data.topic_id);
-      }
-
-      if (res.data.pro_user_id === myUserId) {
-        setIsMePro(true);
-        setMode(DEBATOR);
-      } else if (res.data.con_user_id === myUserId) {
-        setIsMePro(false);
-        setMode(DEBATOR);
-      }
-
       return Promise.resolve(res.data.topic_id);
     }).then((topicId) => {
       axios.get(
@@ -133,11 +130,8 @@ function DebateText({ accessToken }) {
           <div className="level-item">
             <p className="is-size-2 has-text-white">
               { isMePro ? "Opposition" : "Proposition" }
-              {
-                (isMePro && conOnHold || !isMePro && proOnHold) ? 
-                (mode === REVIEW ? " (Done)" : " (Pending...)") :
-                ""
-              }
+              { (isMePro && conOnHold || !isMePro && proOnHold) ? " (Pending...)" : "" }
+              { mode === REVIEW ? " (DONE)" : "" }
             </p>
           </div>
         </div>
@@ -145,11 +139,8 @@ function DebateText({ accessToken }) {
           <div className="level-item has-text-right">
             <p className="is-size-2 has-text-white">
               { isMePro ? "Proposition" : "Opposition" }
-              {
-                (isMePro && proOnHold || !isMePro && conOnHold) ?
-                (mode === REVIEW ? " (Done)" : " (Pending...)") :
-                ""
-              }
+              { (isMePro && proOnHold || !isMePro && conOnHold) ? " (Pending...)" : "" }
+              { mode === REVIEW ? " (DONE)" : "" }
             </p>
           </div>
         </div>
