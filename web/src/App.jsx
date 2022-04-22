@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BrowserRouter,
   Routes,
   Route,
 } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
 
 import NavBar from './components/navbar';
 import Registration from './pages/Registration';
@@ -22,6 +23,13 @@ function App() {
   const resetAccessToken = () => {
     setAccessToken(localStorage.getItem('access_token'));
   };
+
+  useEffect(() => {
+    if (accessToken !== null && jwt_decode(accessToken).exp < Date.now() / 1000) {
+      localStorage.removeItem('access_token');
+      resetAccessToken();
+    }
+  });
 
   return (
     <div className="App columns m-0">
