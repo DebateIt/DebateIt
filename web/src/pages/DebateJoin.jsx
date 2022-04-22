@@ -31,10 +31,10 @@ function DebateJoin({ accessToken }) {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
-            }).then((res) => {
-                navigate(`/debate/${debateId}`);
             }).catch((err) => {
                 console.log(err);
+            }).then(() => {
+                navigate(`/debate/${debateId}`);
             });
         }).catch((err) => {
             console.log(err);

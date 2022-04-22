@@ -91,12 +91,6 @@ function DebateText({ accessToken }) {
     setState(event.target.value);
   };
 
-  // This is a really bad practice here but I'll do it for simplicity's sake
-  // In the future we need to set an endpoint in the backend just to check
-  // if the other user has already sent a message or not. Or we can setup
-  // a websocket server to let the backend update the history data on the
-  // frontend
-
   useEffect(() => {
     axios.get(
       `http://localhost:8000/debate/${debateId}`
@@ -117,8 +111,6 @@ function DebateText({ accessToken }) {
     readHistory();
     setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
   }, []);
-
-  console.log(mode);
 
   return (
     <div className="column is-flex is-flex-direction-column">
