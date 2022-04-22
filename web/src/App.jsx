@@ -15,6 +15,7 @@ import DebateText from './pages/DebateText';
 import Main from './pages/Main';
 import Topic from './pages/Topic';
 import DebateJoin from './pages/DebateJoin';
+import NotFound from './pages/NotFound';
 
 function App() {
   const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
@@ -30,6 +31,10 @@ function App() {
           <Route
             path="/"
             element={ accessToken ? (<Main accessToken={accessToken} />) : (<Intro />) }
+          />
+          <Route
+            path="/404"
+            element={<NotFound />}
           />
           <Route
             path="/topic"

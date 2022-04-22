@@ -17,6 +17,11 @@ def determine_turn(debate_id: int, db: Session) -> bool:
 
 @router.get("/history/{debateID}")
 def get_debate_history(debateID: int, db: Session = Depends(get_db)):
+    if not crud.IsDebateIdExist(debateID, db):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Debate Not Found"
+        )
+    
     return {
         "pro_turn": determine_turn(debateID, db),
         "debate": crud.getOneDebate(debateID, db),

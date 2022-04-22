@@ -91,13 +91,6 @@ function DebateText({ accessToken }) {
     setState(event.target.value);
   };
 
-  const copy_invitation = () => {
-    navigator.clipboard.writeText(
-      `http://localhost:8000/debate/${debateId}/join`
-    );
-    alert("Copied Invitation Link!");
-  }
-
   useEffect(() => {
     axios.get(
       `http://localhost:8000/debate/${debateId}`
@@ -111,12 +104,14 @@ function DebateText({ accessToken }) {
       }).catch((err) => {
         console.log(err);
       });
+
+      readHistory();
+      setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
     }).catch((err) => {
       console.log(err);
+      navigate("/404");
     });
 
-    readHistory();
-    setPeriodicPing(periodicPing ? periodicPing : setInterval(readHistory, 1000));
   }, []);
 
   return (

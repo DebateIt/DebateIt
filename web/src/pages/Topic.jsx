@@ -34,6 +34,7 @@ function Topic({ accessToken }) {
             setTopic(res.data);
         }).catch((err) => {
             console.log(err);
+            navigate("/404");
         });
     }, []);
 
