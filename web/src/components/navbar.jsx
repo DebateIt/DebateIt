@@ -17,12 +17,27 @@ function NavBar({ accessToken }) {
           { accessToken !== null ? jwt_decode(accessToken).username : 'Anonymous' }
         </a>
       </div>
-      <a href="/login" className="py-4 button is-primary is-fullwidth is-family-secondary">
-        Login
-      </a>
-      <a href="/register" className="py-4 button is-primary is-fullwidth is-family-secondary">
-        Register
-      </a>
+      {
+        accessToken !== null ? (
+          <div>
+            <a href="/" className="py-4 button is-primary is-fullwidth is-family-secondary">
+              Dashboard
+            </a>
+            <a href="/user" className="py-4 button is-primary is-fullwidth is-family-secondary">
+              Profile
+            </a>
+          </div>
+        ) : (
+          <div>
+            <a href="/login" className="py-4 button is-primary is-fullwidth is-family-secondary">
+              Login
+            </a>
+            <a href="/register" className="py-4 button is-primary is-fullwidth is-family-secondary">
+              Register
+            </a>
+          </div>
+        )
+      }
     </div>
   );
 }

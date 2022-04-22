@@ -38,7 +38,7 @@ function App() {
           <Route path="/topic/:topicId" element={(<Topic accessToken={accessToken} />)} />
           <Route path="/debate/:debateId" element={(<DebateText accessToken={accessToken} />)} />
           <Route path="/debate/:debateId/join" element={(<DebateJoin accessToken={accessToken} />)} />
-          <Route 
+          <Route
             path="/login"
             element={(
               <Login
