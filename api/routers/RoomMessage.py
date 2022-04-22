@@ -21,7 +21,7 @@ def get_debate_history(debateID: int, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Debate Not Found"
         )
-    
+
     return {
         "pro_turn": determine_turn(debateID, db),
         "debate": crud.getOneDebate(debateID, db),
