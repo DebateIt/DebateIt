@@ -86,10 +86,17 @@ function DebateText({ accessToken }) {
       console.log(err);
     });
   }
-  
+
   const fieldOnChange = (setState) => (event) => {
     setState(event.target.value);
   };
+
+  const copy_invitation = () => {
+    navigator.clipboard.writeText(
+      `http://localhost:8000/debate/${debateId}/join`
+    );
+    alert("Copied Invitation Link!");
+  }
 
   useEffect(() => {
     axios.get(
@@ -161,8 +168,23 @@ function DebateText({ accessToken }) {
           <div
             className="columns is-variable is-1 has-background-info"
             hidden={ mode !== DEBATOR }
-          >
-            <div className="column is-10">
+          >{
+              proOnHold || conOnHold ? (
+                <div className="column is-2">
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="text"
+                      value={ `http://localhost:3000/debate/${debateId}/join` }
+                      readOnly={true}
+                    />
+                  </div>
+                </div>
+              ) : (<div></div>)
+            }
+            <div
+              className={ `column is-${proOnHold || conOnHold ? '8' : '10'}` }
+            >
               <ChatInputBox
                 name="Send Your Argument and Rebuttal"
                 onChange={fieldOnChange(setMessageContent)}
