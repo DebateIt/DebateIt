@@ -73,29 +73,36 @@ function User({ accessToken, resetAccessToken }) {
   };
 
   return (
-    <div className="column is-flex is-flex-direction-column is-align-self-center">
-      <div className="container">
-        <InputBox
-          name="Username"
-          onChange={fieldOnChange(setUsername)}
-          helpInfo={usernameInfo}
-          value={username}
-        />
-        <PasswordBox
-          name="Password"
-          onChange={fieldOnChange(setPassword)}
-          value={password}
-        />
-        <PasswordBox
-          name="__Repeat"
-          onChange={fieldOnChange(setRepeat)}
-          helpInfo={repeatInfo}
-          value={repeat}
-        />
-        <div className="field is-horizontal">
-          <div className="field-body">
-            <Button name="Save" onClick={save} />
-            <Button name="Logout" onClick={logout} />
+    <div className="column">
+      <div className="section">
+        <h2 className="block has-text-white is-size-2">
+          Profile
+        </h2>
+      </div>
+      <div className="is-flex is-flex-direction-column is-align-self-center my-6">
+        <div className="container">
+          <InputBox
+            name="Username"
+            onChange={fieldOnChange(setUsername)}
+            helpInfo={usernameInfo}
+            value={username}
+          />
+          <PasswordBox
+            name="Password"
+            onChange={fieldOnChange(setPassword)}
+            value={password}
+          />
+          <PasswordBox
+            name="__Repeat"
+            onChange={fieldOnChange(setRepeat)}
+            helpInfo={repeatInfo}
+            value={repeat}
+          />
+          <div className="field is-horizontal">
+            <div className="field-body">
+              <Button name="Save" onClick={save} />
+              <Button name="Logout" onClick={logout} />
+            </div>
           </div>
         </div>
       </div>

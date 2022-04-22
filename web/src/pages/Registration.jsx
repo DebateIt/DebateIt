@@ -44,25 +44,32 @@ function Registration() {
   };
 
   return (
-    <div className="column is-flex is-flex-direction-column is-align-self-center">
-      <div className="container">
-        <InputBox
-          name="Username"
-          onChange={fieldOnChange(setUsername)}
-          helpInfo={usernameInfo}
-        />
-        <PasswordBox
-          name="Password"
-          onChange={fieldOnChange(setPassword)}
-        />
-        <PasswordBox
-          name="__Repeat"
-          onChange={fieldOnChange(setRepeat)}
-          helpInfo={repeatInfo}
-        />
-        <div className="field">
-          <div className="field-body">
-            <Button name="Register" onClick={register} />
+    <div className="column">
+      <div className="section">
+        <h2 className="block has-text-white is-size-2">
+          Register
+        </h2>
+      </div>  
+      <div className="is-flex is-flex-direction-column is-align-self-center my-6">
+        <div className="container">
+          <InputBox
+            name="Username"
+            onChange={fieldOnChange(setUsername)}
+            helpInfo={usernameInfo}
+          />
+          <PasswordBox
+            name="Password"
+            onChange={fieldOnChange(setPassword)}
+          />
+          <PasswordBox
+            name="__Repeat"
+            onChange={fieldOnChange(setRepeat)}
+            helpInfo={repeatInfo}
+          />
+          <div className="field">
+            <div className="field-body">
+              <Button name="Register" onClick={register} />
+            </div>
           </div>
         </div>
       </div>
