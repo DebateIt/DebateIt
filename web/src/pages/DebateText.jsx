@@ -5,6 +5,7 @@ import axios from 'axios';
 
 import ChatInputBox from '../components/chatinputbox';
 import Message from '../components/message';
+import config from '../config';
 
 function DebateText({ accessToken }) {
   const DEBATOR = 0;
@@ -29,7 +30,7 @@ function DebateText({ accessToken }) {
 
   const readHistory = () => {
     axios.get(
-      `http://localhost:8000/room/history/${debateId}`
+      config.apiURL(`/room/history/${debateId}`)
     ).then((res) => {
       setHistory(res.data.history);
       setIsProTurn(res.data.pro_turn);
@@ -54,7 +55,7 @@ function DebateText({ accessToken }) {
   }
 
   const send = () => {
-    axios.post('http://localhost:8000/room/message', {
+    axios.post(config.apiURL('/room/message'), {
       "content": messageContent,
       "debate_id": debateId,
       "pro_turn": isProTurn,
@@ -72,7 +73,7 @@ function DebateText({ accessToken }) {
   }
 
   const exit = () => {
-    axios.post('http://localhost:8000/debate/exit', {
+    axios.post(config.apiURL('/debate/exit'), {
       id: debateId,
       as_pro: isMePro,
       as_con: !isMePro,
@@ -93,12 +94,12 @@ function DebateText({ accessToken }) {
 
   useEffect(() => {
     axios.get(
-      `http://localhost:8000/debate/${debateId}`
+      config.apiURL(`/debate/${debateId}`)
     ).then((res) => {
       return Promise.resolve(res.data.topic_id);
     }).then((topicId) => {
       axios.get(
-        `http://localhost:8000/topic/${topicId}`
+        config.apiURL(`/topic/${topicId}`)
       ).then((res) => {
         setTopicName(res.data.name);
       }).catch((err) => {

@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import config from '../config';
+
 function DebateJoin({ accessToken }) {
     const params = useParams();
     const navigate = useNavigate();
@@ -15,7 +17,7 @@ function DebateJoin({ accessToken }) {
         };
 
         axios.get(
-            `http://localhost:8000/debate/${debateId}`
+            config.apiURL(`/debate/${debateId}`)
         ).then((res) => {
             if (res.data.pro_user_id === null) {
                 params.as_pro = true;
@@ -27,7 +29,7 @@ function DebateJoin({ accessToken }) {
 
             return Promise.resolve(params);
         }).then((params) => {
-            axios.post('http://localhost:8000/debate/join', params, {
+            axios.post(config.apiURL('/debate/join'), params, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },

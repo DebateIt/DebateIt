@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 
+import config from "../config";
+
 function Topic({ accessToken }) {
     const navigate = useNavigate();
     const params = useParams();
@@ -16,7 +18,7 @@ function Topic({ accessToken }) {
         if (asPro) params.as_pro = true;
         else params.as_con = true;
 
-        axios.post('http://localhost:8000/debate', params, {
+        axios.post(config.apiURL('/debate'), params, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             }
@@ -29,7 +31,7 @@ function Topic({ accessToken }) {
 
     useEffect(() => {
         axios.get(
-            `http://localhost:8000/topic/${topicId}`
+            config.apiURL(`/topic/${topicId}`)
         ).then((res) => {
             setTopic(res.data);
         }).catch((err) => {

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
+import config from '../config';
 
 function Registration() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function Registration() {
       return;
     }
 
-    axios.post('http://localhost:8000/user', {
+    axios.post(config.apiURL('/user'), {
       username,
       password,
     }).then(() => {

@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import InputBox from '../components/inputbox';
 import Textarea from '../components/textarea';
 import Button from '../components/button';
+import config from '../config';
 
 function TopicCreate({ accessToken }) {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ function TopicCreate({ accessToken }) {
     };
 
     const createTopic = () => {
-        axios.post('http://localhost:8000/topic', {
+        axios.post(config.apiURL('/topic'), {
             name: topicName,
             description,
         }, {

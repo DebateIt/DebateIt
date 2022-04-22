@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -6,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import DebateCard from '../components/debatecard';
-import axios from 'axios';
+import config from '../config';
 
 function Main({ accessToken }) {
     const user_id = jwt_decode(accessToken).id;
@@ -16,7 +17,7 @@ function Main({ accessToken }) {
 
     useEffect(() => {
         axios.get(
-            `http://localhost:8000/debate/debator/${user_id}`
+            config.apiURL(`/debate/debator/${user_id}`)
         ).then((res) => {
             res.data.sort((a, b) => (b.id - a.id))
             res.data.sort((a, b) => (b.status - a.status));
@@ -28,7 +29,7 @@ function Main({ accessToken }) {
 
     useEffect(() => {
         axios.get(
-            `http://localhost:8000/topic`
+            config.apiURL('/topic')
         ).then((res) => {
             setTopics(res.data);
         }).catch((err) => {

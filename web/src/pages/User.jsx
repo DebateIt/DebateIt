@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
+import config from '../config';
 
 function User({ accessToken, resetAccessToken }) {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ function User({ accessToken, resetAccessToken }) {
       params.new_password = password;
     }
 
-    axios.put('http://localhost:8000/user', params, {
+    axios.put(config.apiURL('/user'), params, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import InputBox from '../components/inputbox';
 import PasswordBox from '../components/passwordbox';
 import Button from '../components/button';
+import config from '../config';
 
 function Login({ accessToken, resetAccessToken }) {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ function Login({ accessToken, resetAccessToken }) {
   };
 
   const login = () => {
-    axios.post('http://localhost:8000/login', {
+    axios.post(config.apiURL('/login'), {
       username,
       password,
     }).then((res) => {
