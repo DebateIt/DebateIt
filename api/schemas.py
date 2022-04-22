@@ -136,6 +136,8 @@ class Debate(BaseModel):
 
     @validator("start_time")
     def check_time(cls, v):
+        v = v.replace(tzinfo=None)
+
         if v < datetime.now():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

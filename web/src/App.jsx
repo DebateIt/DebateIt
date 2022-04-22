@@ -12,6 +12,10 @@ import User from './pages/User';
 import Intro from './pages/Intro';
 import TopicCreate from './pages/TopicCreate';
 import DebateText from './pages/DebateText';
+import Main from './pages/Main';
+import Topic from './pages/Topic';
+import DebateJoin from './pages/DebateJoin';
+import NotFound from './pages/NotFound';
 
 function App() {
   const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
@@ -26,14 +30,21 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={(<DebateText />)}
+            element={ accessToken ? (<Main accessToken={accessToken} />) : (<Intro />) }
           />
           <Route
-            path="topic"
+            path="/404"
+            element={<NotFound />}
+          />
+          <Route
+            path="/topic"
             element={(<TopicCreate accessToken={accessToken} />)}
           />
+          <Route path="/topic/:topicId" element={(<Topic accessToken={accessToken} />)} />
+          <Route path="/debate/:debateId" element={(<DebateText accessToken={accessToken} />)} />
+          <Route path="/debate/:debateId/join" element={(<DebateJoin accessToken={accessToken} />)} />
           <Route
-            path="login"
+            path="/login"
             element={(
               <Login
                 accessToken={accessToken}
@@ -42,13 +53,13 @@ function App() {
             )}
           />
           <Route
-            path="register"
+            path="/register"
             element={
               <Registration />
             }
           />
           <Route
-            path="user"
+            path="/user"
             element={(
               <User
                 accessToken={accessToken}

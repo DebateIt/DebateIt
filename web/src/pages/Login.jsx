@@ -31,27 +31,34 @@ function Login({ accessToken, resetAccessToken }) {
     }).then((res) => {
       localStorage.setItem('access_token', res.data.token_content);
       resetAccessToken();
-      navigate('/user');
+      navigate('/');
     }).catch((err) => {
       setUsernameInfo(err.response.data.detail);
     });
   };
 
   return (
-    <div className="column is-flex is-flex-direction-column is-align-self-center">
-      <div className="container">
-        <InputBox
-          name="Username"
-          onChange={fieldOnChange(setUsername)}
-          helpInfo={usernameInfo}
-        />
-        <PasswordBox
-          name="Password"
-          onChange={fieldOnChange(setPassword)}
-        />
-        <div className="field">
-          <div className="field-body">
-            <Button name="Login" onClick={login} />
+    <div className="column">
+      <div className="section">
+        <h2 className="block has-text-white is-size-2">
+          Login
+        </h2>
+      </div>
+      <div className="is-flex is-flex-direction-column is-align-self-center my-6">
+        <div className="container">
+          <InputBox
+            name="Username"
+            onChange={fieldOnChange(setUsername)}
+            helpInfo={usernameInfo}
+          />
+          <PasswordBox
+            name="Password"
+            onChange={fieldOnChange(setPassword)}
+          />
+          <div className="field">
+            <div className="field-body">
+              <Button name="Login" onClick={login} />
+            </div>
           </div>
         </div>
       </div>
