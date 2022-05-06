@@ -171,7 +171,7 @@ function DebateText({ accessToken }) {
                     <input
                       className="input"
                       type="text"
-                      value={ `http://localhost:3000/debate/${debateId}/join` }
+                      value={ window.location.origin + `/debate/${debateId}/join` }
                       readOnly={true}
                     />
                   </div>
