@@ -9,6 +9,25 @@ It is a design project for CS-UY 4513 Software Engineering and CS-UY 4523 Design
 
 ## Repo Structure
 
+`.github` - Github Actions
+`design` - Stores some design graphs
 `web` - Frontend code, written in `Javascript` and `React.js`\
 `api` - Backend code, written in `Python3` and `Fastapi`\
+`.gitignore` - Ignore generated files
+`CONTRIBUTING.md` - Some git usage guidelines for this project
 `README.md` - You're reading it right now
+
+## Run
+
+Open one terminal and type:
+```
+uvicorn api.main:app --host:0.0.0.0 --reload
+```
+
+Open another one and type:
+```
+cd web
+npm start
+```
+
+And visit the provided link 
