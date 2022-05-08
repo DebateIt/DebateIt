@@ -17,6 +17,14 @@ It is a design project for CS-UY 4513 Software Engineering and CS-UY 4523 Design
 `CONTRIBUTING.md` - Some git usage guidelines for this project
 `README.md` - You're reading it right now
 
+## Install Dependencies
+```
+cd api
+pip install -r requirements.txt
+cd ../web
+npm install
+```
+
 ## Run
 
 Open one terminal and type:
