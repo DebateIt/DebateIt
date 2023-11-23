@@ -53,7 +53,6 @@ def leave_debate(
 @router.get("/{id}")
 def get_debate_info(id: int, db: Session = Depends(get_db)) -> models.Debate:
     if not IsDebateIdExist(id, db):
-
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Debate Not Found"
         )

@@ -7,6 +7,7 @@ from ..crud import *
 
 router = APIRouter(prefix="/topic")
 
+
 # check whether the user of "creator_id" owns the topic of "topic_id"
 def own_topic(topic_id: int, creator_id: int, db: Session):
     if creator_id != db.query(Topic).filter(Topic.id == topic_id).first().creator_id:

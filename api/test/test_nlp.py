@@ -30,7 +30,6 @@ def test_get_topics():
 
 
 def test_sentence_sim():
-
     res = client.post(
         "/nlp/sentence_sim",
         json={"new_topic": "Do you like feminism form in your country?"},
